@@ -1,6 +1,4 @@
-﻿using MatthiWare.CommandLine;
-using System;
-using webport_comport_scanner.Options;
+﻿using System;
 using webport_comport_scanner.Parser;
 
 namespace webport_comport_scanner
@@ -15,14 +13,16 @@ namespace webport_comport_scanner
 
         static void Main(string[] args)
         {
+            ArgumentParser argumentParser = new ArgumentParser();
+
             if (args.Length < 1)
             {
                 Console.WriteLine("Error : No arguments specified.");
+                argumentParser.DisplayOptions();
                 Close();
                 return;
             }
-
-            ArgumentParser argumentParser = new ArgumentParser();
+            
             argumentParser.Parse(ref args);
             Close();
         }
