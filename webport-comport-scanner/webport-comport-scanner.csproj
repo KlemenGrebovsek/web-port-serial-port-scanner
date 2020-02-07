@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="MatthiWare.CommandLineParser" Version="0.2.4" />
+    <PackageReference Include="System.IO.Ports" Version="4.7.0" />
   </ItemGroup>
 
 </Project>

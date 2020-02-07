@@ -14,7 +14,7 @@ namespace webport_comport_scanner
         static void Main(string[] args)
         {
             ArgumentParser argumentParser = new ArgumentParser();
-
+            args = new string[] { "scanCOM" };
             if (args.Length < 1)
             {
                 Console.WriteLine("Error : No arguments specified.");

@@ -8,7 +8,5 @@ namespace webport_comport_scanner.Scanners
     interface IScanner
     {
         public void Scan(ProgramOptions options);
-
-        public void PrintR();
     }
 }

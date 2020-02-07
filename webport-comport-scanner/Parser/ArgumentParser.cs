@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using MatthiWare.CommandLine;
 using webport_comport_scanner.Options;
 using webport_comport_scanner.Scanners;
@@ -52,8 +50,7 @@ namespace webport_comport_scanner.Parser
                 .Name(name)
                 .Required(required)
                 .Description(description)
-                .OnExecuting((p) =>
-                {
+                .OnExecuting((p) => { 
                     scanner.Scan(p);
                 });
         }
