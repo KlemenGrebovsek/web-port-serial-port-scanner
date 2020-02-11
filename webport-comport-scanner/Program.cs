@@ -1,30 +1,18 @@
-﻿using System;
+﻿using MatthiWare.CommandLine;
+using System;
 using webport_comport_scanner.Parser;
 
 namespace webport_comport_scanner
 {
     class Program
     {
-        private static void Close()
-        {
-            Console.WriteLine("\nPress any key to close the program...");
-            Console.ReadKey();
-        }
-
         static void Main(string[] args)
         {
             ArgumentParser argumentParser = new ArgumentParser();
-            args = new string[] { "scanCOM" };
-            if (args.Length < 1)
-            {
-                Console.WriteLine("Error : No arguments specified.");
-                argumentParser.DisplayOptions();
-                Close();
-                return;
-            }
-            
+            args = new string[] { "scanWEB","-f", "50", "-t", "150" };
             argumentParser.Parse(ref args);
-            Close();
+            Console.WriteLine("\nPress any key to close the program...");
+            Console.ReadKey();
         }
     }
 }

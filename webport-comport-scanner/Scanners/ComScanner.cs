@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using webport_comport_scanner.Options;
 using System.IO.Ports;
-using webport_comport_scanner.Models;
+using static webport_comport_scanner.Models.Models;
 
 namespace webport_comport_scanner.Scanners
 {
@@ -12,6 +12,7 @@ namespace webport_comport_scanner.Scanners
         {
             Console.WriteLine("Colletings COM port info.");
         }
+
         public void Scan(ProgramOptions options)
         {
             Task<ComPortInfo[]> info = Task<ComPortInfo[]>.Factory.StartNew(() => GetComPortsInfo());
@@ -39,11 +40,11 @@ namespace webport_comport_scanner.Scanners
                 try
                 {
                     serialPort.Open();
-                    portsInfo[i].Status = "Available";
+                    portsInfo[i].Status = PortStatus.FREE;
                 }
                 catch (Exception)
                 {
-                    portsInfo[i].Status = "In use";
+                    portsInfo[i].Status = PortStatus.IN_USE;
                 }
                 finally
                 {
@@ -63,8 +64,13 @@ namespace webport_comport_scanner.Scanners
 
             for (int i = 0; i < info.Length; i++)
             {
-                Console.WriteLine($"PORT: {info[i].Name}  STATUS: {info[i].Status}");
+                Console.WriteLine($"Serial port: {info[i].Name}  , Status: {info[i].Status.ToString()}");
             }
+        }
+
+        public void Describe()
+        {
+            Console.WriteLine("scanCOM -> This command scans and displays serial ports status.");
         }
     }
 }

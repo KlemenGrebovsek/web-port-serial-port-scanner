@@ -2,6 +2,7 @@
 using MatthiWare.CommandLine;
 using webport_comport_scanner.Options;
 using webport_comport_scanner.Scanners;
+using MatthiWare.CommandLine.Extensions.FluentValidations;
 
 namespace webport_comport_scanner.Parser
 {
@@ -11,60 +12,52 @@ namespace webport_comport_scanner.Parser
 
         public ArgumentParser()
         {
-            argParser = new CommandLineParser<ProgramOptions>(
-                new CommandLineParserOptions { AppName = "Com and web port scanner.", EnableHelpOption = true });
+            argParser = new CommandLineParser<ProgramOptions>(new CommandLineParserOptions{ AppName = "Com and web port scanner."});
+            argParser.UseFluentValidations(configurator => configurator.AddValidator<ProgramOptions, ProgramOptionValidator>());
 
-            AddCommandToParser("scanWEB", "Scans web ports.", false, new WebScanner());
-            AddCommandToParser("scanCOM", "Scans com ports.", false, new ComScanner());
+            argParser.AddCommand()
+                .Name("scanWEB")
+                .Required(false)
+                .Description("This command scans web port stats for given address. (Default = localhost)")
+                .OnExecuting((o) => {
+                    WebScanner webScanner = new WebScanner();
+                    webScanner.Scan(o);
+                });
+
+            argParser.AddCommand()
+                .Name("scanCOM")
+                .Required(false)
+                .Description("This command scans serial ports.")
+                .OnExecuting((o) => {
+                    ComScanner comScanner = new ComScanner();
+                    comScanner.Scan(o);
+                });
+
         }
 
         public void Parse(ref string[] args)
         {
-            var parseResult = argParser.Parse(args);
-
-            if (parseResult.HasErrors)
+            if(args.Length < 1 || argParser.Parse(args).HasErrors)
             {
-                Console.WriteLine("Error : Failed to parse arguments");
+                Console.WriteLine("Error: No command or arguemtns given.");
+                DisplayOptions();
                 return;
             }
 
-            ProgramOptions programOptions = parseResult.Result;
-
-            if (ValidatePorts(ref programOptions, out string error))
-                Console.WriteLine(String.Format("Arguments validation error : {0}.", error));
-
         }
 
-        public void DisplayOptions()
+        private void DisplayOptions()
         {
-            var argOptions = argParser.Options;
+            Console.WriteLine("\nCommands:");
+
+            for (int i = 0; i < argParser.Commands.Count; i++)
+                Console.WriteLine($"{argParser.Commands[i].Name} -> {argParser.Commands[i].Description}");
+
             Console.WriteLine("\nArgument options:");
 
-            for (int i = 0; i < argOptions.Count; i++)
-                Console.WriteLine($"{argOptions[i].ShortName}  {argOptions[i].LongName}  {argOptions[i].Description} ");
+            for (int i = 0; i < argParser.Options.Count; i++)
+                Console.WriteLine($"{argParser.Options[i].ShortName}  {argParser.Options[i].LongName} {argParser.Options[i].Description}");
         }
 
-        private void AddCommandToParser(string name, string description, bool required, IScanner scanner)
-        {
-            argParser.AddCommand<ProgramOptions>()
-                .Name(name)
-                .Required(required)
-                .Description(description)
-                .OnExecuting((p) => { 
-                    scanner.Scan(p);
-                });
-        }
-
-        private bool ValidatePorts(ref ProgramOptions programOptions, out string error)
-        {
-            if (programOptions.MaxPort > 65535 || programOptions.MinPort < 0)
-            {
-                error = "Port range must be between 0 and 65535";
-                return true;
-            }
-
-            error = "";
-            return false;
-        } 
     }
 }
