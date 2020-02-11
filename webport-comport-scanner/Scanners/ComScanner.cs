@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using webport_comport_scanner.Options;
 using System.IO.Ports;
-using static webport_comport_scanner.Models.Models;
+using webport_comport_scanner.Models;
 
 namespace webport_comport_scanner.Scanners
 {

@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using webport_comport_scanner.Options;
-using static webport_comport_scanner.Models.Models;
+using webport_comport_scanner.Models;
 
 namespace webport_comport_scanner.Scanners
 {
@@ -25,7 +24,9 @@ namespace webport_comport_scanner.Scanners
             for (int currentPort = options.MinPort; currentPort <= options.MaxPort; currentPort++)
             {
                 Task<WebPortInfo> job = CheckPort(currentPort);
-                portsToCheck.Add(job);
+
+                if (job.Result.Status != PortStatus.FREE)
+                    portsToCheck.Add(job);
             }
 
             return await Task.WhenAll(portsToCheck);
@@ -62,10 +63,11 @@ namespace webport_comport_scanner.Scanners
 
         private void PrintR(ref WebPortInfo[] webPortInfos)
         {
+            Console.WriteLine("UNAVAIBLE PORTS:");
+
             for (int i = 0; i < webPortInfos.Length; i++)
-            {
-                Console.WriteLine($"Port: {webPortInfos[i].Port} , Status: {webPortInfos[i].Status.ToString()}");
-            }
+                Console.WriteLine($"Port: {webPortInfos[i].Port}  Status: {webPortInfos[i].Status.ToString()}");
+
         }
 
     }
