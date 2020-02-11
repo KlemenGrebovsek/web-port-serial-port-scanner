@@ -12,13 +12,17 @@ namespace webport_comport_scanner.Parser
 
         public ArgumentParser()
         {
-            argParser = new CommandLineParser<ProgramOptions>(new CommandLineParserOptions{ AppName = "Com and web port scanner."});
-            argParser.UseFluentValidations(configurator => configurator.AddValidator<ProgramOptions, ProgramOptionValidator>());
+            argParser = new CommandLineParser<ProgramOptions>(new CommandLineParserOptions{
+                AppName = "Com and web port scanner."}
+            );
+
+            argParser.UseFluentValidations(configurator => 
+                        configurator.AddValidator<ProgramOptions, ProgramOptionValidator>());
 
             argParser.AddCommand()
                 .Name("scanWEB")
                 .Required(false)
-                .Description("This command scans web port stats for given address. (Default = localhost)")
+                .Description("This command scans web ports.")
                 .OnExecuting((o) => {
                     WebScanner webScanner = new WebScanner();
                     webScanner.Scan(o);
@@ -27,7 +31,7 @@ namespace webport_comport_scanner.Parser
             argParser.AddCommand()
                 .Name("scanCOM")
                 .Required(false)
-                .Description("This command scans serial ports.")
+                .Description("This command scans com ports.")
                 .OnExecuting((o) => {
                     ComScanner comScanner = new ComScanner();
                     comScanner.Scan(o);
@@ -43,7 +47,6 @@ namespace webport_comport_scanner.Parser
                 DisplayOptions();
                 return;
             }
-
         }
 
         private void DisplayOptions()
@@ -53,7 +56,7 @@ namespace webport_comport_scanner.Parser
             for (int i = 0; i < argParser.Commands.Count; i++)
                 Console.WriteLine($"{argParser.Commands[i].Name} -> {argParser.Commands[i].Description}");
 
-            Console.WriteLine("\nArgument options:");
+            Console.WriteLine("\nArgument options (web) :");
 
             for (int i = 0; i < argParser.Options.Count; i++)
                 Console.WriteLine($"{argParser.Options[i].ShortName}  {argParser.Options[i].LongName} {argParser.Options[i].Description}");

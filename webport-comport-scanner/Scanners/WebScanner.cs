@@ -12,6 +12,7 @@ namespace webport_comport_scanner.Scanners
     {
         public void Scan(ProgramOptions options)
         {
+            Console.WriteLine("Scanning ports...");
             Task<WebPortInfo[]> task = CheckPorts(options);
             WebPortInfo[] webPortInfos = task.Result;
             PrintR(ref webPortInfos);
@@ -37,10 +38,10 @@ namespace webport_comport_scanner.Scanners
             return Task<WebPortInfo>.Factory.StartNew(() =>
             {
                 TcpListener tcpListener = default;
-
+                
                 try
                 {
-                    tcpListener = new TcpListener(Dns.GetHostEntry("localhost").AddressList[0], port);
+                    tcpListener = new TcpListener(Dns.GetHostEntry(Dns.GetHostName()).AddressList[0], port);
                     tcpListener.Start();
                     tcpListener.Stop();
                     return new WebPortInfo { Status = PortStatus.FREE };

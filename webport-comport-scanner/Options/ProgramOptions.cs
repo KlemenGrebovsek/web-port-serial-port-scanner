@@ -16,10 +16,6 @@ namespace webport_comport_scanner.Options
         [DefaultValue(65535)]
         public int MaxPort { get; set; }
 
-        [Name("ip", "ipAddress")]
-        [Description("Ip address.")]
-        [DefaultValue("localhost")]
-        public string IpAddress { get; set; }
     }
 
     public class ProgramOptionValidator : AbstractValidator<ProgramOptions>

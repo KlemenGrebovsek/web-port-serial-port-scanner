@@ -8,13 +8,9 @@ namespace webport_comport_scanner.Scanners
 {
     public class ComScanner : IScanner
     {
-        public ComScanner()
-        {
-            Console.WriteLine("Colletings COM port info.");
-        }
-
         public void Scan(ProgramOptions options)
         {
+            Console.WriteLine("Scanning ports...");
             Task<ComPortInfo[]> info = Task<ComPortInfo[]>.Factory.StartNew(() => GetComPortsInfo());
             PrintR(info.Result);
         }
@@ -37,6 +33,7 @@ namespace webport_comport_scanner.Scanners
             {
                 serialPort = new SerialPort(comPorts[i]);
                 portsInfo[i] = new ComPortInfo { Name = comPorts[i] };
+
                 try
                 {
                     serialPort.Open();
@@ -50,6 +47,7 @@ namespace webport_comport_scanner.Scanners
                 {
                     serialPort.Close();
                 }
+
             }
 
             return portsInfo;
@@ -63,14 +61,9 @@ namespace webport_comport_scanner.Scanners
             Console.WriteLine("\nScan results:");
 
             for (int i = 0; i < info.Length; i++)
-            {
                 Console.WriteLine($"Serial port: {info[i].Name}  , Status: {info[i].Status.ToString()}");
-            }
+
         }
 
-        public void Describe()
-        {
-            Console.WriteLine("scanCOM -> This command scans and displays serial ports status.");
-        }
     }
 }
