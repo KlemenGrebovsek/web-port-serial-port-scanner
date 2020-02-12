@@ -18,14 +18,14 @@ namespace webport_comport_scanner.Scanners
         private ComPortInfo[] GetComPortsInfo()
         {
             string[] comPorts = SerialPort.GetPortNames();
-            ComPortInfo[] portsInfo = new ComPortInfo[comPorts.Length];
-
-            if(portsInfo.Length < 1)
+            
+            if(comPorts.Length < 1)
             {
                 Console.WriteLine("No com ports found.");
-                return new ComPortInfo[] { };
+                return new ComPortInfo[0];
             }
 
+            ComPortInfo[] portsInfo = new ComPortInfo[comPorts.Length];
             Array.Sort(comPorts);
             SerialPort serialPort;
 
@@ -58,7 +58,7 @@ namespace webport_comport_scanner.Scanners
             if (info.Length < 1)
                 return;
 
-            Console.WriteLine("\nScan results:");
+            Console.WriteLine("\nUNAVAIBLE PORTS:");
 
             for (int i = 0; i < info.Length; i++)
                 Console.WriteLine($"Serial port: {info[i].Name}  , Status: {info[i].Status.ToString()}");

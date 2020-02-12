@@ -45,7 +45,6 @@ namespace webport_comport_scanner.Parser
             {
                 Console.WriteLine("Error: No command or arguemtns given.");
                 DisplayOptions();
-                return;
             }
         }
 
@@ -59,7 +58,8 @@ namespace webport_comport_scanner.Parser
             Console.WriteLine("\nArgument options (web) :");
 
             for (int i = 0; i < argParser.Options.Count; i++)
-                Console.WriteLine($"{argParser.Options[i].ShortName}  {argParser.Options[i].LongName} {argParser.Options[i].Description}");
+                Console.WriteLine($"{argParser.Options[i].ShortName}  {argParser.Options[i].LongName}" +
+                    $" {argParser.Options[i].Description}");
         }
 
     }
