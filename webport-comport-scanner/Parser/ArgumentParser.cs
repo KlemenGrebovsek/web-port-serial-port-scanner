@@ -24,6 +24,8 @@ namespace webport_comport_scanner.Parser
                 .Required(false)
                 .Description("This command scans web ports.")
                 .OnExecuting((o) => {
+                    Console.WriteLine("Scanning web ports...");
+
                     WebScanner webScanner = new WebScanner();
                     webScanner.Scan(o);
                 });
@@ -33,6 +35,8 @@ namespace webport_comport_scanner.Parser
                 .Required(false)
                 .Description("This command scans com ports.")
                 .OnExecuting((o) => {
+                    Console.WriteLine("Scanning com ports...");
+
                     ComScanner comScanner = new ComScanner();
                     comScanner.Scan(o);
                 });

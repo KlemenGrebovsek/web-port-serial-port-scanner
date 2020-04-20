@@ -5,6 +5,7 @@ using System.Net.Sockets;
 using System.Threading.Tasks;
 using webport_comport_scanner.Options;
 using webport_comport_scanner.Models;
+using webport_comport_scanner.Printer;
 
 namespace webport_comport_scanner.Scanners
 {
@@ -12,10 +13,10 @@ namespace webport_comport_scanner.Scanners
     {
         public void Scan(ProgramOptions options)
         {
-            Console.WriteLine("Scanning ports...");
-            Task<WebPortInfo[]> task = CheckPorts(options);
-            WebPortInfo[] webPortInfos = task.Result;
-            PrintR(ref webPortInfos);
+            WebPortInfo[] webPortInfos = CheckPorts(options).Result;
+            ResultPrinter printer = new ResultPrinter();
+
+            printer.PrintR(webPortInfos, "PORT", "STATUS");
         }
 
         private async Task<WebPortInfo[]> CheckPorts(ProgramOptions options)
@@ -61,15 +62,5 @@ namespace webport_comport_scanner.Scanners
                 }
             });
         }
-
-        private void PrintR(ref WebPortInfo[] webPortInfos)
-        {
-            Console.WriteLine("UNAVAIBLE PORTS:");
-
-            for (int i = 0; i < webPortInfos.Length; i++)
-                Console.WriteLine($"Port: {webPortInfos[i].Port}  Status: {webPortInfos[i].Status.ToString()}");
-
-        }
-
     }
 }

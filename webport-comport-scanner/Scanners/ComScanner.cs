@@ -3,16 +3,18 @@ using System.Threading.Tasks;
 using webport_comport_scanner.Options;
 using System.IO.Ports;
 using webport_comport_scanner.Models;
+using webport_comport_scanner.Printer;
 
 namespace webport_comport_scanner.Scanners
 {
     public class ComScanner : IScanner
     {
         public void Scan(ProgramOptions options)
-        {
-            Console.WriteLine("Scanning ports...");
-            Task<ComPortInfo[]> info = Task<ComPortInfo[]>.Factory.StartNew(() => GetComPortsInfo());
-            PrintR(info.Result);
+        {    
+            ComPortInfo[] comInfo = Task<ComPortInfo[]>.Factory.StartNew(() => GetComPortsInfo()).Result;
+            ResultPrinter printer = new ResultPrinter();
+
+            printer.PrintR(comInfo, "PORT", "STATUS");
         }
 
         private ComPortInfo[] GetComPortsInfo()
@@ -52,18 +54,5 @@ namespace webport_comport_scanner.Scanners
 
             return portsInfo;
         }
-        
-        private void PrintR(ComPortInfo[] info)
-        {
-            if (info.Length < 1)
-                return;
-
-            Console.WriteLine("\nUNAVAIBLE PORTS:");
-
-            for (int i = 0; i < info.Length; i++)
-                Console.WriteLine($"Serial port: {info[i].Name}  , Status: {info[i].Status.ToString()}");
-
-        }
-
     }
 }
