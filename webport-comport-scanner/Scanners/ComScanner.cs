@@ -11,10 +11,8 @@ namespace webport_comport_scanner.Scanners
     {
         public void Scan(ProgramOptions options)
         {    
-            ComPortInfo[] comInfo = Task<ComPortInfo[]>.Factory.StartNew(() => GetComPortsInfo()).Result;
             ResultPrinter printer = new ResultPrinter();
-
-            printer.PrintR(comInfo, "PORT", "STATUS");
+            printer.PrintR(Task<ComPortInfo[]>.Factory.StartNew(() => GetComPortsInfo()).Result, "PORT", "STATUS");
         }
 
         private ComPortInfo[] GetComPortsInfo()
@@ -29,6 +27,7 @@ namespace webport_comport_scanner.Scanners
 
             ComPortInfo[] portsInfo = new ComPortInfo[comPorts.Length];
             Array.Sort(comPorts);
+
             SerialPort serialPort;
 
             for (int i = 0; i < comPorts.Length; i++)

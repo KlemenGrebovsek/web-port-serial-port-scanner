@@ -13,10 +13,8 @@ namespace webport_comport_scanner.Scanners
     {
         public void Scan(ProgramOptions options)
         {
-            WebPortInfo[] webPortInfos = CheckPorts(options).Result;
             ResultPrinter printer = new ResultPrinter();
-
-            printer.PrintR(webPortInfos, "PORT", "STATUS");
+            printer.PrintR(CheckPorts(options).Result, "PORT", "STATUS");
         }
 
         private async Task<WebPortInfo[]> CheckPorts(ProgramOptions options)
