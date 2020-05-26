@@ -25,7 +25,7 @@ namespace webport_comport_scanner.Scanners
             {
                 Task<WebPortInfo> job = CheckPort(currentPort);
 
-                if (job.Result.Status != PortStatus.FREE)
+                if (job.Result.GetPortStatus() != PortStatus.FREE)
                     portsToCheck.Add(job);
             }
 
@@ -43,16 +43,16 @@ namespace webport_comport_scanner.Scanners
                     tcpListener = new TcpListener(Dns.GetHostEntry(Dns.GetHostName()).AddressList[0], port);
                     tcpListener.Start();
                     tcpListener.Stop();
-                    return new WebPortInfo { Status = PortStatus.FREE };
+                    return new WebPortInfo(port, PortStatus.FREE);
 
                 }
                 catch (SocketException)
                 {
-                    return new WebPortInfo { Port = port, Status = PortStatus.IN_USE };
+                    return new WebPortInfo(port, PortStatus.IN_USE);
                 }
                 catch (Exception)
                 {
-                    return new WebPortInfo { Port = port, Status = PortStatus.UNKNOWN };
+                    return new WebPortInfo(port, PortStatus.UNKNOWN);
                 }
                 finally
                 {

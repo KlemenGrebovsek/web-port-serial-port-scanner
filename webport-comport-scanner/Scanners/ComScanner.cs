@@ -33,16 +33,15 @@ namespace webport_comport_scanner.Scanners
             for (int i = 0; i < comPorts.Length; i++)
             {
                 serialPort = new SerialPort(comPorts[i]);
-                portsInfo[i] = new ComPortInfo { Name = comPorts[i] };
-
+ 
                 try
                 {
                     serialPort.Open();
-                    portsInfo[i].Status = PortStatus.FREE;
+                    portsInfo[i] = new ComPortInfo(comPorts[i], PortStatus.FREE);
                 }
                 catch (Exception)
                 {
-                    portsInfo[i].Status = PortStatus.IN_USE;
+                    portsInfo[i] = new ComPortInfo(comPorts[i], PortStatus.IN_USE);
                 }
                 finally
                 {

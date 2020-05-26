@@ -8,6 +8,9 @@ namespace webport_comport_scanner.Printer
     {
         public void PrintR(IPrintable[] data, string title, string value)
         {
+            if (data.Length == 0)
+                return;
+
             int maxChar = data.Max(x => x.GetPrintMaxLenght());
 
             maxChar = (title.Length > maxChar) ? title.Length : maxChar;

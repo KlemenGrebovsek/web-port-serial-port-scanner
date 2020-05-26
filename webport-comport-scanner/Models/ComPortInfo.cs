@@ -2,25 +2,32 @@
 {
     public class ComPortInfo : IPrintable
     {
-        public string Name { get; set; }
-        public PortStatus Status { get; set; }
+        private string name;
+        private PortStatus status;
+
+        public ComPortInfo(string name, PortStatus status)
+        {
+            this.name = name;
+            this.status = status;
+        }
 
         public string GetName()
         {
-            return Name;
-        }
-
-        public int GetPrintMaxLenght()
-        {
-            int nameLen = Name.Length;
-            int statusLen = Status.ToString().Length;
-
-            return (nameLen > statusLen) ? nameLen : statusLen;
+            return this.name;
         }
 
         public string GetValue()
         {
-            return Status.ToString();
+            return status.ToString();
         }
+
+        public int GetPrintMaxLenght()
+        {
+            int nameLen = name.Length;
+            int statusLen = status.ToString().Length;
+
+            return (nameLen > statusLen) ? nameLen : statusLen;
+        }
+ 
     }
 }
