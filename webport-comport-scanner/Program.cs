@@ -8,7 +8,7 @@ namespace webport_comport_scanner
         static void Main(string[] args)
         {
             ArgumentParser argumentParser = new ArgumentParser();
-            argumentParser.Parse(ref args);
+            argumentParser.Parse(args);
             Console.WriteLine("\nPress any key to close the program...");
             Console.ReadKey();
         }

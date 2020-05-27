@@ -43,7 +43,7 @@ namespace webport_comport_scanner.Parser
 
         }
 
-        public void Parse(ref string[] args)
+        public void Parse(string[] args)
         {
             if(args.Length < 1 || argParser.Parse(args).HasErrors)
             {
