@@ -13,6 +13,13 @@ namespace webport_comport_scanner.Scanners
     {
         public void Scan(ProgramOptions options)
         {
+
+            if (options.MaxPort < options.MinPort)
+            {
+                Console.WriteLine("Error: MaxPort value is less than MinPort value.");
+                return;
+            }
+
             ResultPrinter printer = new ResultPrinter();
             printer.PrintR(CheckPorts(options).Result, "PORT", "STATUS");
         }
