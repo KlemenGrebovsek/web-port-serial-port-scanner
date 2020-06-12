@@ -12,7 +12,7 @@ namespace webport_comport_scanner.Scanners
         public void Scan(ProgramOptions options)
         {    
             ResultPrinter printer = new ResultPrinter();
-            printer.PrintR(Task<ComPortInfo[]>.Factory.StartNew(() => GetComPortsInfo()).Result, "PORT", "STATUS");
+            printer.PrintR(GetComPortsInfo(), "PORT", "STATUS");
         }
 
         private ComPortInfo[] GetComPortsInfo()
