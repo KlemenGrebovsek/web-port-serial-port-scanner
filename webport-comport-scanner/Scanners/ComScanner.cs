@@ -45,7 +45,8 @@ namespace webport_comport_scanner.Scanners
                 }
                 finally
                 {
-                    serialPort.Close();
+                    if (serialPort.IsOpen)
+                        serialPort.Close();
                 }
 
             }

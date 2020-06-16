@@ -63,7 +63,7 @@ namespace webport_comport_scanner.Scanners
                 }
                 finally
                 {
-                  tcpListener.Stop();
+                    tcpListener.Stop();
                 }
             });
         }
