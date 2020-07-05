@@ -1,15 +1,18 @@
 ﻿using System;
 using webport_comport_scanner.Models;
 using System.Linq;
+using webport_comport_scanner.Arhitecture;
+using System.Collections.Generic;
 
 namespace webport_comport_scanner.Printer
 {
-    public class ResultPrinter
+    public class ResultPrinter : IResultPrinter
     {
-        public void PrintR(IPrintable[] data, string title, string value)
+        public void PrintR(IEnumerable<IPrintable> data, string title, string value)
         {
-            if (data.Length == 0)
-                return;
+            int printColSize = data.Count();
+
+            if (printColSize == 0) return;
 
             int maxChar = data.Max(x => x.GetPrintMaxLenght());
 
@@ -17,31 +20,23 @@ namespace webport_comport_scanner.Printer
             maxChar = (value.Length > maxChar) ? value.Length : maxChar;
             maxChar = (maxChar < 10) ? 10 : maxChar;
 
-            string specLine = $"+{GetLine((maxChar * 2) + 2)}+";
+            string tableLine = $"+{new string('-', (maxChar * 2) + 1 )}+";
 
             Console.WriteLine($"\n {FillStringToLenght(title, maxChar)} {FillStringToLenght(value, maxChar)} ");
 
-            for (int i = 0; i < data.Length; i++)
+            for (int i = 0; i < printColSize; i++)
             {
-                Console.WriteLine(specLine);
-                Console.WriteLine($"|{FillStringToLenght(data[i].GetName(), maxChar)}|{FillStringToLenght(data[i].GetValue(), maxChar)}|");
+                Console.WriteLine(tableLine);
+                Console.WriteLine($"|{FillStringToLenght(data.ElementAt(i).GetName(), maxChar)}|{FillStringToLenght(data.ElementAt(i).GetValue(), maxChar)}|");
             }
 
-            Console.WriteLine(specLine);
+            Console.WriteLine(tableLine);
         }
-
 
         private string FillStringToLenght(string value, int lenght)
         {
             return String.Format($"{{0,{lenght * -1}}}", String.Format("{0," + ((lenght + value.Length) / 2).ToString() + "}", value));
         }
 
-        private string GetLine(int length)
-        {
-            if (length < 1)
-                return "";
-
-            return new string('-', length - 1);
-        }
     }
 }

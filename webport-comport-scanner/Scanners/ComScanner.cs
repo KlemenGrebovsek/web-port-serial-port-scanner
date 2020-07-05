@@ -1,52 +1,39 @@
 ﻿using System;
-using System.Threading.Tasks;
 using webport_comport_scanner.Options;
 using System.IO.Ports;
 using webport_comport_scanner.Models;
-using webport_comport_scanner.Printer;
+using System.Collections.Generic;
 
 namespace webport_comport_scanner.Scanners
 {
     public class ComScanner : IScanner
     {
-        public void Scan(ProgramOptions options)
-        {    
-            ResultPrinter printer = new ResultPrinter();
-            printer.PrintR(GetComPortsInfo(), "PORT", "STATUS");
-        }
-
-        private ComPortInfo[] GetComPortsInfo()
+        public IEnumerable<IPrintable> Scan(ProgramOptions options)
         {
             string[] comPorts = SerialPort.GetPortNames();
-            
-            if(comPorts.Length < 1)
-            {
-                Console.WriteLine("No com ports found.");
-                return new ComPortInfo[0];
-            }
 
-            ComPortInfo[] portsInfo = new ComPortInfo[comPorts.Length];
-            Array.Sort(comPorts);
+            if (comPorts.Length < 1) throw new Exception("No com ports found.");
+
+            IList<ComPortInfo> portsInfo = new List<ComPortInfo>(comPorts.Length);
 
             SerialPort serialPort;
 
             for (int i = 0; i < comPorts.Length; i++)
             {
                 serialPort = new SerialPort(comPorts[i]);
- 
+
                 try
                 {
                     serialPort.Open();
-                    portsInfo[i] = new ComPortInfo(comPorts[i], PortStatus.FREE);
+                    portsInfo.Add(new ComPortInfo(comPorts[i], PortStatus.FREE));
                 }
                 catch (Exception)
                 {
-                    portsInfo[i] = new ComPortInfo(comPorts[i], PortStatus.IN_USE);
+                    portsInfo.Add(new ComPortInfo(comPorts[i], PortStatus.IN_USE));
                 }
                 finally
                 {
-                    if (serialPort.IsOpen)
-                        serialPort.Close();
+                    if (serialPort.IsOpen) serialPort.Close();
                 }
 
             }

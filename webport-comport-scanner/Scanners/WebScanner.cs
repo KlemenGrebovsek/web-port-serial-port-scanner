@@ -5,43 +5,35 @@ using System.Net.Sockets;
 using System.Threading.Tasks;
 using webport_comport_scanner.Options;
 using webport_comport_scanner.Models;
-using webport_comport_scanner.Printer;
 
 namespace webport_comport_scanner.Scanners
 {
     public class WebScanner : IScanner
     {
-        public void Scan(ProgramOptions options)
+        public IEnumerable<IPrintable> Scan(ProgramOptions options)
         {
+            if (options.MaxPort < options.MinPort) throw new Exception("MaxPort value is less than MinPort value.");
 
-            if (options.MaxPort < options.MinPort)
-            {
-                Console.WriteLine("Error: MaxPort value is less than MinPort value.");
-                return;
-            }
-
-            ResultPrinter printer = new ResultPrinter();
-            printer.PrintR(CheckPorts(options).Result, "PORT", "STATUS");
+            return CheckPortsStatus(options).Result;
         }
-
-        private async Task<WebPortInfo[]> CheckPorts(ProgramOptions options)
+        private async Task<IList<WebPortInfo>> CheckPortsStatus(ProgramOptions options)
         {
-            List<Task<WebPortInfo>> portsToCheck = new List<Task<WebPortInfo>>();
-             
+            IList<Task<WebPortInfo>> portCheckTasks = new List<Task<WebPortInfo>>();
+
             for (int currentPort = options.MinPort; currentPort <= options.MaxPort; currentPort++)
             {
                 Task<WebPortInfo> job = CheckPort(currentPort);
-
+          
                 if (job.Result.GetPortStatus() != PortStatus.FREE)
-                    portsToCheck.Add(job);
+                    portCheckTasks.Add(job);
             }
 
-            return await Task.WhenAll(portsToCheck);
+            return await Task.WhenAll(portCheckTasks);
         }
 
         private Task<WebPortInfo> CheckPort(int port)
         {
-            return Task<WebPortInfo>.Factory.StartNew(() =>
+            return Task.Run(() =>
             {
                 TcpListener tcpListener = default;
                 
@@ -50,8 +42,8 @@ namespace webport_comport_scanner.Scanners
                     tcpListener = new TcpListener(Dns.GetHostEntry(Dns.GetHostName()).AddressList[0], port);
                     tcpListener.Start();
                     tcpListener.Stop();
-                    return new WebPortInfo(port, PortStatus.FREE);
 
+                    return new WebPortInfo(port, PortStatus.FREE);
                 }
                 catch (SocketException)
                 {

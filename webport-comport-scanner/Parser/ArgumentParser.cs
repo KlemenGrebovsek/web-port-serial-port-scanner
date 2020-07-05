@@ -3,6 +3,10 @@ using MatthiWare.CommandLine;
 using webport_comport_scanner.Options;
 using webport_comport_scanner.Scanners;
 using MatthiWare.CommandLine.Extensions.FluentValidations;
+using System.Linq;
+using MatthiWare.CommandLine.Abstractions.Parsing;
+using webport_comport_scanner.Printer;
+using webport_comport_scanner.Arhitecture;
 
 namespace webport_comport_scanner.Parser
 {
@@ -12,8 +16,11 @@ namespace webport_comport_scanner.Parser
 
         public ArgumentParser()
         {
-            argParser = new CommandLineParser<ProgramOptions>(new CommandLineParserOptions{
-                AppName = "Com and web port scanner."}
+            argParser = new CommandLineParser<ProgramOptions>(
+                new CommandLineParserOptions
+                {
+                    AppName = "Com and web port scanner.", 
+                }
             );
 
             argParser.UseFluentValidations(configurator => 
@@ -26,8 +33,18 @@ namespace webport_comport_scanner.Parser
                 .OnExecuting((o) => {
                     Console.WriteLine("Scanning web ports...");
 
-                    WebScanner webScanner = new WebScanner();
-                    webScanner.Scan(o);
+                    IScanner webScanner = new WebScanner();
+                    IResultPrinter printer = new ResultPrinter();
+
+                    try  
+                    { 
+                        printer.PrintR(webScanner.Scan(o), "PORT", "STATUS");
+                    } 
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("Error: " + e.Message);
+                    }
+                    
                 });
 
             argParser.AddCommand()
@@ -35,19 +52,39 @@ namespace webport_comport_scanner.Parser
                 .Required(false)
                 .Description("This command scans com ports.")
                 .OnExecuting((o) => {
-                    Console.WriteLine("Scanning com ports...");
+                    IScanner webScanner = new ComScanner();
+                    IResultPrinter printer = new ResultPrinter();
 
-                    ComScanner comScanner = new ComScanner();
-                    comScanner.Scan(o);
+                    try
+                    {
+                        printer.PrintR(webScanner.Scan(o), "PORT", "STATUS");
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("Error: " + e.Message);
+                    }
                 });
 
         }
 
         public void Parse(string[] args)
         {
-            if(args.Length < 1 || argParser.Parse(args).HasErrors)
+            if(args.Length < 1)
             {
-                Console.WriteLine("Error: No command or arguemtns given.");
+                Console.WriteLine("Error: No command or arguments given.");
+                DisplayOptions();
+                return;
+            }
+
+            IParserResult<ProgramOptions> programOptions = argParser.Parse(args);
+
+            if (programOptions.HasErrors)
+            {
+                Console.WriteLine("Parse errors:");
+
+                for (int i = 0; i < programOptions.Errors.Count; i++)
+                    Console.WriteLine($"Error({i}) -> {programOptions.Errors.ElementAt(i).Message}");
+
                 DisplayOptions();
             }
         }
