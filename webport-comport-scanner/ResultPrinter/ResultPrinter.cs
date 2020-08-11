@@ -11,7 +11,7 @@ namespace webport_comport_scanner.Printer
         const string portColumn = "PORT";
         const string statusColumn = "STATUS";
 
-        public void PrintTable(IEnumerable<IPrintablePortResult> data)
+        public void PrintTable(IEnumerable<IPrintableScanResult> data)
         {
             int printColSize = data.Count();
 

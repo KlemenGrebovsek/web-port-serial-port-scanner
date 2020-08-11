@@ -11,7 +11,7 @@ namespace webport_comport_scanner.Scanners
 {
     public class WebPortScanner : IPortScanner
     {
-        public IEnumerable<IPrintablePortResult> Scan(ProgramOptions options)
+        public IEnumerable<IPrintableScanResult> Scan(ProgramOptions options)
         {
             return CheckPortsStatus(options).Result.Where(x => x.GetStatusRaw() != PortStatus.FREE);
         }

@@ -9,6 +9,6 @@ namespace webport_comport_scanner.Arhitecture
         /// Prints scanning results as a table.
         /// </summary>
         /// <param name="scanResults">Collection of scanning results.</param>
-        void PrintTable(IEnumerable<IPrintablePortResult> scanResults);
+        void PrintTable(IEnumerable<IPrintableScanResult> scanResults);
     }
 }

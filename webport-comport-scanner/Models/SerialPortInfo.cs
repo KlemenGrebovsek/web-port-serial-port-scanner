@@ -1,6 +1,6 @@
 ﻿namespace webport_comport_scanner.Models
 {
-    public class SerialPortInfo : IPrintablePortResult
+    public class SerialPortInfo : IPrintableScanResult
     {
         private string name;
         private PortStatus status;

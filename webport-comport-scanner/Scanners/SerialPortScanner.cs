@@ -8,7 +8,7 @@ namespace webport_comport_scanner.Scanners
 {
     public class SerialPortScanner : IPortScanner
     {
-        public IEnumerable<IPrintablePortResult> Scan(ProgramOptions options)
+        public IEnumerable<IPrintableScanResult> Scan(ProgramOptions options)
         {
             string[] comPorts = SerialPort.GetPortNames();
 

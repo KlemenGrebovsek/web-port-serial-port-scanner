@@ -11,6 +11,6 @@ namespace webport_comport_scanner.Scanners
         /// </summary>
         /// <param name="options">Program options generated from args parser.</param>
         /// <returns>Collection of scan status.</returns>
-        public IEnumerable<IPrintablePortResult> Scan(ProgramOptions options);
+        public IEnumerable<IPrintableScanResult> Scan(ProgramOptions options);
     }
 }

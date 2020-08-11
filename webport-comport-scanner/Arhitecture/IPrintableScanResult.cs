@@ -1,6 +1,6 @@
 ﻿namespace webport_comport_scanner.Models
 {
-    public interface IPrintablePortResult
+    public interface IPrintableScanResult
     {
         /// <summary>
         /// Calculates maximum lenght of print string for this object.

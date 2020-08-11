@@ -1,6 +1,6 @@
 ﻿namespace webport_comport_scanner.Models
 {
-    public class WebPortInfo : IPrintablePortResult
+    public class WebPortInfo : IPrintableScanResult
     {
         private int port;
         private PortStatus status;
