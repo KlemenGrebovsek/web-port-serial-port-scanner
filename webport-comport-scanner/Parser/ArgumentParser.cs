@@ -19,7 +19,8 @@ namespace webport_comport_scanner.Parser
             argParser = new CommandLineParser<ProgramOptions>(
                 new CommandLineParserOptions
                 {
-                    AppName = "Com and web port scanner.", 
+                    AppName = "Serial and web port scanner.", 
+                    EnableHelpOption = true,
                 }
             );
 
@@ -27,42 +28,47 @@ namespace webport_comport_scanner.Parser
                         configurator.AddValidator<ProgramOptions, ProgramOptionValidator>());
 
             argParser.AddCommand()
-                .Name("scanWEB")
+
+                .Name("webPort")
                 .Required(false)
-                .Description("This command scans web ports.")
+                .Description("This command scans web ports. (Displays only used ones.)")
                 .OnExecuting((o) => {
+
+                    if (o.MaxPort < o.MinPort)
+                    {
+                        Console.WriteLine("Error: max port value cannot be less than min port value.");
+                        return;
+                    }
+
                     Console.WriteLine("Scanning web ports...");
 
-                    IScanner webScanner = new WebScanner();
+                    IPortScanner webScanner = new WebPortScanner();
                     IResultPrinter printer = new ResultPrinter();
 
-                    try  
-                    { 
-                        printer.PrintR(webScanner.Scan(o), "PORT", "STATUS");
-                    } 
-                    catch (Exception e)
-                    {
-                        Console.WriteLine("Error: " + e.Message);
-                    }
-                    
+                    printer.PrintTable(webScanner.Scan(o));
+                    Console.WriteLine("\n Done!");
                 });
 
             argParser.AddCommand()
-                .Name("scanCOM")
+                .Name("serialPort")
                 .Required(false)
-                .Description("This command scans com ports.")
+                .Description("This command scans serial ports. (Displays all.)")
                 .OnExecuting((o) => {
-                    IScanner webScanner = new ComScanner();
+
+                    Console.WriteLine("Scanning serial ports...");
+                    IPortScanner webScanner = new SerialPortScanner();
                     IResultPrinter printer = new ResultPrinter();
 
-                    try
-                    {
-                        printer.PrintR(webScanner.Scan(o), "PORT", "STATUS");
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine("Error: " + e.Message);
-                    }
+                    printer.PrintTable(webScanner.Scan(o));
+                    Console.WriteLine("\n Done!");
+                });
+
+            argParser.AddCommand()
+                .Name("help")
+                .Required(false)
+                .Description("This command displays program options.")
+                .OnExecuting((o) => {
+                    DisplayOptions();
                 });
 
         }
@@ -91,17 +97,10 @@ namespace webport_comport_scanner.Parser
 
         private void DisplayOptions()
         {
-            Console.WriteLine("\nCommands:");
+            IParserResult<ProgramOptions> programOptions = argParser.Parse(new string[1] { "--help" });
 
-            for (int i = 0; i < argParser.Commands.Count; i++)
-                Console.WriteLine($"{argParser.Commands[i].Name} -> {argParser.Commands[i].Description}");
-
-            Console.WriteLine("\nArgument options (web) :");
-
-            for (int i = 0; i < argParser.Options.Count; i++)
-                Console.WriteLine($"{argParser.Options[i].ShortName}  {argParser.Options[i].LongName}" +
-                    $" {argParser.Options[i].Description}");
+            if (programOptions.HasErrors)
+                Console.WriteLine("Error occured.");
         }
-
     }
 }

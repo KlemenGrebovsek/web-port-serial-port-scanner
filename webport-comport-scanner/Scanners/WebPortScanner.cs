@@ -5,28 +5,22 @@ using System.Net.Sockets;
 using System.Threading.Tasks;
 using webport_comport_scanner.Options;
 using webport_comport_scanner.Models;
+using System.Linq;
 
 namespace webport_comport_scanner.Scanners
 {
-    public class WebScanner : IScanner
+    public class WebPortScanner : IPortScanner
     {
-        public IEnumerable<IPrintable> Scan(ProgramOptions options)
+        public IEnumerable<IPrintablePortResult> Scan(ProgramOptions options)
         {
-            if (options.MaxPort < options.MinPort) throw new Exception("MaxPort value is less than MinPort value.");
-
-            return CheckPortsStatus(options).Result;
+            return CheckPortsStatus(options).Result.Where(x => x.GetStatusRaw() != PortStatus.FREE);
         }
-        private async Task<IList<WebPortInfo>> CheckPortsStatus(ProgramOptions options)
+        private async Task<IEnumerable<WebPortInfo>> CheckPortsStatus(ProgramOptions options)
         {
-            IList<Task<WebPortInfo>> portCheckTasks = new List<Task<WebPortInfo>>();
+            ICollection<Task<WebPortInfo>> portCheckTasks = new List<Task<WebPortInfo>>();
 
             for (int currentPort = options.MinPort; currentPort <= options.MaxPort; currentPort++)
-            {
-                Task<WebPortInfo> job = CheckPort(currentPort);
-          
-                if (job.Result.GetPortStatus() != PortStatus.FREE)
-                    portCheckTasks.Add(job);
-            }
+                portCheckTasks.Add(CheckPort(currentPort));
 
             return await Task.WhenAll(portCheckTasks);
         }
@@ -41,7 +35,6 @@ namespace webport_comport_scanner.Scanners
                 {
                     tcpListener = new TcpListener(Dns.GetHostEntry(Dns.GetHostName()).AddressList[0], port);
                     tcpListener.Start();
-                    tcpListener.Stop();
 
                     return new WebPortInfo(port, PortStatus.FREE);
                 }

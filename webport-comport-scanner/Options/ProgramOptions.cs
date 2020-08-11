@@ -7,12 +7,12 @@ namespace webport_comport_scanner.Options
     public class ProgramOptions
     {
         [Name("f", "from")]
-        [Description("Program scans ports that are equal or greater than this value (0 - 65535).")]
+        [Description("(webPort) Scans ports that are equal or greater than this value (0 - 65535).")]
         [DefaultValue(0)]
         public int MinPort { get; set; }
 
         [Name("t", "to")]
-        [Description("Program scans ports that are equal or less than this value (0 - 65535).")]
+        [Description("(webPort) Scans ports that are equal or less than this value (0 - 65535).")]
         [DefaultValue(65535)]
         public int MaxPort { get; set; }
 

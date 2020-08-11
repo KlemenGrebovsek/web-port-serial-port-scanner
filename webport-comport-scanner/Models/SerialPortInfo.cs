@@ -1,11 +1,11 @@
 ﻿namespace webport_comport_scanner.Models
 {
-    public class ComPortInfo : IPrintable
+    public class SerialPortInfo : IPrintablePortResult
     {
         private string name;
         private PortStatus status;
 
-        public ComPortInfo(string name, PortStatus status)
+        public SerialPortInfo(string name, PortStatus status)
         {
             this.name = name;
             this.status = status;
@@ -13,15 +13,15 @@
 
         public string GetName()
         {
-            return this.name;
+            return name;
         }
 
-        public string GetValue()
+        public string GetStatus()
         {
             return status.ToString();
         }
 
-        public int GetPrintMaxLenght()
+        public int GetMaxPrintLenght()
         {
             int nameLen = name.Length;
             int statusLen = status.ToString().Length;

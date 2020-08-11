@@ -8,26 +8,34 @@ namespace webport_comport_scanner.Printer
 {
     public class ResultPrinter : IResultPrinter
     {
-        public void PrintR(IEnumerable<IPrintable> data, string title, string value)
+        const string portColumn = "PORT";
+        const string statusColumn = "STATUS";
+
+        public void PrintTable(IEnumerable<IPrintablePortResult> data)
         {
             int printColSize = data.Count();
 
-            if (printColSize == 0) return;
+            if (printColSize == 0)
+            {
+                Console.WriteLine("No scan results.");
+                return;
+            }
 
-            int maxChar = data.Max(x => x.GetPrintMaxLenght());
+            int maxPrintLenColumn = data.Max(x => x.GetMaxPrintLenght());
 
-            maxChar = (title.Length > maxChar) ? title.Length : maxChar;
-            maxChar = (value.Length > maxChar) ? value.Length : maxChar;
-            maxChar = (maxChar < 10) ? 10 : maxChar;
+            maxPrintLenColumn = (portColumn.Length > maxPrintLenColumn) ? portColumn.Length : maxPrintLenColumn;
+            maxPrintLenColumn = (statusColumn.Length > maxPrintLenColumn) ? statusColumn.Length : maxPrintLenColumn;
+            maxPrintLenColumn = (maxPrintLenColumn < 10) ? 10 : maxPrintLenColumn;
 
-            string tableLine = $"+{new string('-', (maxChar * 2) + 1 )}+";
+            string tableLine = $"+{new string('-', (maxPrintLenColumn * 2) + 1 )}+";
 
-            Console.WriteLine($"\n {FillStringToLenght(title, maxChar)} {FillStringToLenght(value, maxChar)} ");
+            Console.WriteLine($"\n {FillStringToLenght(portColumn, maxPrintLenColumn)}" +
+                $" {FillStringToLenght(statusColumn, maxPrintLenColumn)} ");
 
             for (int i = 0; i < printColSize; i++)
             {
                 Console.WriteLine(tableLine);
-                Console.WriteLine($"|{FillStringToLenght(data.ElementAt(i).GetName(), maxChar)}|{FillStringToLenght(data.ElementAt(i).GetValue(), maxChar)}|");
+                Console.WriteLine($"|{FillStringToLenght(data.ElementAt(i).GetName(), maxPrintLenColumn)}|{FillStringToLenght(data.ElementAt(i).GetStatus(), maxPrintLenColumn)}|");
             }
 
             Console.WriteLine(tableLine);
@@ -37,6 +45,5 @@ namespace webport_comport_scanner.Printer
         {
             return String.Format($"{{0,{lenght * -1}}}", String.Format("{0," + ((lenght + value.Length) / 2).ToString() + "}", value));
         }
-
     }
 }

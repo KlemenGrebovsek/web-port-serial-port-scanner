@@ -1,6 +1,6 @@
 ﻿namespace webport_comport_scanner.Models
 {
-    public class WebPortInfo : IPrintable
+    public class WebPortInfo : IPrintablePortResult
     {
         private int port;
         private PortStatus status;
@@ -21,12 +21,17 @@
             return port.ToString();
         }
 
-        public string GetValue()
+        public string GetStatus()
         {
             return status.ToString();
         }
 
-        public int GetPrintMaxLenght()
+        public PortStatus GetStatusRaw()
+        {
+            return status;
+        }
+
+        public int GetMaxPrintLenght()
         {
             int nameLen = port.ToString().Length;
             int statusLen = status.ToString().Length;
