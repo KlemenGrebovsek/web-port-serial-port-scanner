@@ -1,4 +1,4 @@
-# webport-comport-scanner
+# web port, serial port - scanner
 Simple console program for scanning web port and serial (com) port status. (v2.0.1)
 
 <br/>
