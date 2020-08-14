@@ -1,11 +1,11 @@
 ﻿namespace webport_comport_scanner.Models
 {
-    public class WebPortInfo : IPrintableScanResult
+    public class WebPortStatus : IPrintableScanResult
     {
         private int port;
         private PortStatus status;
 
-        public WebPortInfo(int port, PortStatus status)
+        public WebPortStatus(int port, PortStatus status)
         {
             this.port = port;
             this.status = status;
@@ -26,7 +26,7 @@
             return status.ToString();
         }
 
-        public PortStatus GetStatusRaw()
+        public PortStatus GetStatusEnum()
         {
             return status;
         }

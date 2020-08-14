@@ -8,34 +8,36 @@ namespace webport_comport_scanner.Printer
 {
     public class ResultPrinter : IResultPrinter
     {
-        const string portColumn = "PORT";
-        const string statusColumn = "STATUS";
+        const string portColumnHeader = "PORT";
+        const string statusColumnHeader = "STATUS";
 
-        public void PrintTable(IEnumerable<IPrintableScanResult> data)
+        public void PrintTable(IEnumerable<IPrintableScanResult> scanResults)
         {
-            int printColSize = data.Count();
+            int printColSize = scanResults.Count();
 
             if (printColSize == 0)
             {
-                Console.WriteLine("No scan results.");
+                Console.WriteLine("Empty scan result colletion.");
                 return;
             }
 
-            int maxPrintLenColumn = data.Max(x => x.GetMaxPrintLenght());
+            int maxPrintLenColumn = scanResults.Max(x => x.GetMaxPrintLenght());
 
-            maxPrintLenColumn = (portColumn.Length > maxPrintLenColumn) ? portColumn.Length : maxPrintLenColumn;
-            maxPrintLenColumn = (statusColumn.Length > maxPrintLenColumn) ? statusColumn.Length : maxPrintLenColumn;
+            maxPrintLenColumn = (portColumnHeader.Length > maxPrintLenColumn) ? portColumnHeader.Length : maxPrintLenColumn;
+            maxPrintLenColumn = (statusColumnHeader.Length > maxPrintLenColumn) ? statusColumnHeader.Length : maxPrintLenColumn;
             maxPrintLenColumn = (maxPrintLenColumn < 10) ? 10 : maxPrintLenColumn;
 
             string tableLine = $"+{new string('-', (maxPrintLenColumn * 2) + 1 )}+";
 
-            Console.WriteLine($"\n {FillStringToLenght(portColumn, maxPrintLenColumn)}" +
-                $" {FillStringToLenght(statusColumn, maxPrintLenColumn)} ");
+            Console.WriteLine($"\n {FillStringToLenght(portColumnHeader, maxPrintLenColumn)}" +
+                $" {FillStringToLenght(statusColumnHeader, maxPrintLenColumn)} ");
 
             for (int i = 0; i < printColSize; i++)
             {
                 Console.WriteLine(tableLine);
-                Console.WriteLine($"|{FillStringToLenght(data.ElementAt(i).GetName(), maxPrintLenColumn)}|{FillStringToLenght(data.ElementAt(i).GetStatus(), maxPrintLenColumn)}|");
+
+                Console.WriteLine($"|{FillStringToLenght(scanResults.ElementAt(i).GetName(), maxPrintLenColumn)}|" +
+                    $"{FillStringToLenght(scanResults.ElementAt(i).GetStatus(), maxPrintLenColumn)}|");
             }
 
             Console.WriteLine(tableLine);
@@ -43,7 +45,8 @@ namespace webport_comport_scanner.Printer
 
         private string FillStringToLenght(string value, int lenght)
         {
-            return String.Format($"{{0,{lenght * -1}}}", String.Format("{0," + ((lenght + value.Length) / 2).ToString() + "}", value));
+            return String.Format($"{{0,{lenght * -1}}}", String.Format("{0," +
+                ((lenght + value.Length) / 2).ToString() + "}", value));
         }
     }
 }

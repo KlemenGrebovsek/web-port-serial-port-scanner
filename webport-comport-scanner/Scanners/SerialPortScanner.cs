@@ -3,6 +3,7 @@ using webport_comport_scanner.Options;
 using System.IO.Ports;
 using webport_comport_scanner.Models;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace webport_comport_scanner.Scanners
 {
@@ -10,31 +11,31 @@ namespace webport_comport_scanner.Scanners
     {
         public IEnumerable<IPrintableScanResult> Scan(ProgramOptions options)
         {
-            string[] comPorts = SerialPort.GetPortNames();
+            string[] seriaPortNames = SerialPort.GetPortNames();
 
-            if (comPorts.Length < 1)
-                return new List<SerialPortInfo>(0);
+            if (seriaPortNames.Length < 1)
+                return Enumerable.Empty<SerialPortStatus>();
 
-            ICollection<SerialPortInfo> comPortInfos = new List<SerialPortInfo>(comPorts.Length);
+            List<SerialPortStatus> serialPortStatusCollection = new List<SerialPortStatus>(seriaPortNames.Length);
 
             SerialPort serialPort;
 
-            for (int i = 0; i < comPorts.Length; i++)
+            for (int i = 0; i < seriaPortNames.Length; i++)
             {
-                serialPort = new SerialPort(comPorts[i]);
+                serialPort = new SerialPort(seriaPortNames[i]);
 
                 try
                 {
                     serialPort.Open();
-                    comPortInfos.Add(new SerialPortInfo(comPorts[i], PortStatus.FREE));
+                    serialPortStatusCollection.Add(new SerialPortStatus(seriaPortNames[i], PortStatus.FREE));
                 }
                 catch (UnauthorizedAccessException)
                 {
-                    comPortInfos.Add(new SerialPortInfo(comPorts[i], PortStatus.IN_USE));
+                    serialPortStatusCollection.Add(new SerialPortStatus(seriaPortNames[i], PortStatus.IN_USE));
                 }
                 catch (Exception)
                 {
-                    comPortInfos.Add(new SerialPortInfo(comPorts[i], PortStatus.UNKNOWN));
+                    serialPortStatusCollection.Add(new SerialPortStatus(seriaPortNames[i], PortStatus.UNKNOWN));
                 }
                 finally
                 {
@@ -44,7 +45,7 @@ namespace webport_comport_scanner.Scanners
 
             }
 
-            return comPortInfos;
+            return serialPortStatusCollection;
         }
     }
 }

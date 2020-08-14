@@ -1,11 +1,11 @@
 ﻿namespace webport_comport_scanner.Models
 {
-    public class SerialPortInfo : IPrintableScanResult
+    public class SerialPortStatus : IPrintableScanResult
     {
         private string name;
         private PortStatus status;
 
-        public SerialPortInfo(string name, PortStatus status)
+        public SerialPortStatus(string name, PortStatus status)
         {
             this.name = name;
             this.status = status;

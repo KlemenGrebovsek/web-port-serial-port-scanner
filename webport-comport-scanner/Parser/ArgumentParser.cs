@@ -34,12 +34,6 @@ namespace webport_comport_scanner.Parser
                 .Description("This command scans web ports. (Displays only used ones.)")
                 .OnExecuting((o) => {
 
-                    if (o.MaxPort < o.MinPort)
-                    {
-                        Console.WriteLine("Error: max port value cannot be less than min port value.");
-                        return;
-                    }
-
                     Console.WriteLine("Scanning web ports...");
 
                     IPortScanner webScanner = new WebPortScanner();
@@ -97,10 +91,8 @@ namespace webport_comport_scanner.Parser
 
         private void DisplayOptions()
         {
-            IParserResult<ProgramOptions> programOptions = argParser.Parse(new string[1] { "--help" });
-
-            if (programOptions.HasErrors)
-                Console.WriteLine("Error occured.");
+            Console.WriteLine();
+            argParser.Parse(new string[1] { "--help" });
         }
     }
 }

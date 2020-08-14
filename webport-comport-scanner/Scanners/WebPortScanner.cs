@@ -13,19 +13,24 @@ namespace webport_comport_scanner.Scanners
     {
         public IEnumerable<IPrintableScanResult> Scan(ProgramOptions options)
         {
-            return CheckPortsStatus(options).Result.Where(x => x.GetStatusRaw() != PortStatus.FREE);
+            if (options.MaxPort < options.MinPort)
+                return Enumerable.Empty<IPrintableScanResult>();
+
+            return CheckPortsStatus(options)
+                .Result
+                .Where(x => x.GetStatusEnum() != PortStatus.FREE);
         }
-        private async Task<IEnumerable<WebPortInfo>> CheckPortsStatus(ProgramOptions options)
+        private async Task<IEnumerable<WebPortStatus>> CheckPortsStatus(ProgramOptions options)
         {
-            ICollection<Task<WebPortInfo>> portCheckTasks = new List<Task<WebPortInfo>>();
+            List<Task<WebPortStatus>> checkPortStatusTaskCollection = new List<Task<WebPortStatus>>(options.MaxPort - options.MinPort);
 
-            for (int currentPort = options.MinPort; currentPort <= options.MaxPort; currentPort++)
-                portCheckTasks.Add(CheckPort(currentPort));
+            for (int currPort = options.MinPort; currPort <= options.MaxPort; currPort++)
+                checkPortStatusTaskCollection.Add(CheckPort(currPort));
 
-            return await Task.WhenAll(portCheckTasks);
+            return await Task.WhenAll(checkPortStatusTaskCollection);
         }
 
-        private Task<WebPortInfo> CheckPort(int port)
+        private Task<WebPortStatus> CheckPort(int port)
         {
             return Task.Run(() =>
             {
@@ -36,15 +41,15 @@ namespace webport_comport_scanner.Scanners
                     tcpListener = new TcpListener(Dns.GetHostEntry(Dns.GetHostName()).AddressList[0], port);
                     tcpListener.Start();
 
-                    return new WebPortInfo(port, PortStatus.FREE);
+                    return new WebPortStatus(port, PortStatus.FREE);
                 }
                 catch (SocketException)
                 {
-                    return new WebPortInfo(port, PortStatus.IN_USE);
+                    return new WebPortStatus(port, PortStatus.IN_USE);
                 }
                 catch (Exception)
                 {
-                    return new WebPortInfo(port, PortStatus.UNKNOWN);
+                    return new WebPortStatus(port, PortStatus.UNKNOWN);
                 }
                 finally
                 {
