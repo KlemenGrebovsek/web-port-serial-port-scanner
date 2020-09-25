@@ -31,30 +31,30 @@ namespace webport_comport_scanner.Parser
 
                 .Name("webPort")
                 .Required(false)
-                .Description("This command scans web ports. (Displays only used ones.)")
+                .Description("This command scans web ports.")
                 .OnExecuting((o) => {
 
                     Console.WriteLine("Scanning web ports...");
 
-                    IPortScanner webScanner = new WebPortScanner();
+                    IPortScanner webPortScanner = new WebPortScanner();
                     IResultPrinter printer = new ResultPrinter();
 
-                    printer.PrintTable(webScanner.Scan(o));
-                    Console.WriteLine("\n Done!");
+                    printer.PrintTable(webPortScanner.Scan(o));
+                    Console.WriteLine("\nDone!");
                 });
 
             argParser.AddCommand()
                 .Name("serialPort")
                 .Required(false)
-                .Description("This command scans serial ports. (Displays all.)")
+                .Description("This command scans serial ports.")
                 .OnExecuting((o) => {
 
                     Console.WriteLine("Scanning serial ports...");
-                    IPortScanner webScanner = new SerialPortScanner();
+                    IPortScanner serialPortScanner = new SerialPortScanner();
                     IResultPrinter printer = new ResultPrinter();
 
-                    printer.PrintTable(webScanner.Scan(o));
-                    Console.WriteLine("\n Done!");
+                    printer.PrintTable(serialPortScanner.Scan(o));
+                    Console.WriteLine("\nDone!");
                 });
 
             argParser.AddCommand()
@@ -62,7 +62,7 @@ namespace webport_comport_scanner.Parser
                 .Required(false)
                 .Description("This command displays program options.")
                 .OnExecuting((o) => {
-                    DisplayOptions();
+                    argParser.Printer.PrintUsage();
                 });
 
         }
@@ -72,27 +72,28 @@ namespace webport_comport_scanner.Parser
             if(args.Length < 1)
             {
                 Console.WriteLine("Error: No command or arguments given.");
-                DisplayOptions();
+                argParser.Printer.PrintUsage();
                 return;
             }
 
-            IParserResult<ProgramOptions> programOptions = argParser.Parse(args);
+            if (!argParser.Commands.Any(x => x.Name == args[0]) && args[0] != "--help")
+            {
+                Console.WriteLine("Error: Invalid command given.");
+                argParser.Printer.PrintUsage();
+                return;
+            }
 
-            if (programOptions.HasErrors)
+            IParserResult<ProgramOptions> parserResult = argParser.Parse(args);
+
+            if (parserResult.HasErrors)
             {
                 Console.WriteLine("Parse errors:");
 
-                for (int i = 0; i < programOptions.Errors.Count; i++)
-                    Console.WriteLine($"Error({i}) -> {programOptions.Errors.ElementAt(i).Message}");
+                for (int i = 0; i < parserResult.Errors.Count; i++)
+                    Console.WriteLine($"Error({i}) -> {parserResult.Errors.ElementAt(i).Message}");
 
-                DisplayOptions();
+                argParser.Printer.PrintUsage();
             }
-        }
-
-        private void DisplayOptions()
-        {
-            Console.WriteLine();
-            argParser.Parse(new string[1] { "--help" });
         }
     }
 }

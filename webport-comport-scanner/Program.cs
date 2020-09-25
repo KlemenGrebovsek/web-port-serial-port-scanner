@@ -1,5 +1,4 @@
-﻿using System;
-using webport_comport_scanner.Parser;
+﻿using webport_comport_scanner.Parser;
 
 namespace webport_comport_scanner
 {

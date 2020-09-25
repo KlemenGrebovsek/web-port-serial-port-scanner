@@ -17,7 +17,7 @@ namespace webport_comport_scanner.Printer
 
             if (printColSize == 0)
             {
-                Console.WriteLine("Empty scan result colletion.");
+                Console.WriteLine("No port found.");
                 return;
             }
 
