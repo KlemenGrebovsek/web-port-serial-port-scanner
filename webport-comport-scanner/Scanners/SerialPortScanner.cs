@@ -7,9 +7,12 @@ using System.Linq;
 
 namespace webport_comport_scanner.Scanners
 {
+    /// <summary>
+    /// Scans for serial ports and their status.
+    /// </summary>
     public class SerialPortScanner : IPortScanner
     {
-        public IEnumerable<IPrintableScanResult> Scan(ProgramOptions options)
+        public IEnumerable<IPrintableScanResult> Scan(int minPort, int maxPort)
         {
             string[] seriaPortNames = SerialPort.GetPortNames();
 

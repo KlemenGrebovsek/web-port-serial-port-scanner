@@ -10,9 +10,9 @@ using webport_comport_scanner.Arhitecture;
 
 namespace webport_comport_scanner.Parser
 {
-    class ArgumentParser
+    public class ArgumentParser : IArgumentParser
     {
-        private static CommandLineParser<ProgramOptions> argParser;
+        private CommandLineParser<ProgramOptions> argParser;
 
         public ArgumentParser()
         {
@@ -39,7 +39,7 @@ namespace webport_comport_scanner.Parser
                     IPortScanner webPortScanner = new WebPortScanner();
                     IResultPrinter printer = new ResultPrinter();
 
-                    printer.PrintTable(webPortScanner.Scan(o));
+                    printer.PrintTable(webPortScanner.Scan(o.MinPort, o.MaxPort));
                     Console.WriteLine("\nDone!");
                 });
 
@@ -53,7 +53,7 @@ namespace webport_comport_scanner.Parser
                     IPortScanner serialPortScanner = new SerialPortScanner();
                     IResultPrinter printer = new ResultPrinter();
 
-                    printer.PrintTable(serialPortScanner.Scan(o));
+                    printer.PrintTable(serialPortScanner.Scan(o.MinPort, o.MaxPort));
                     Console.WriteLine("\nDone!");
                 });
 
@@ -76,6 +76,7 @@ namespace webport_comport_scanner.Parser
                 return;
             }
 
+            // check for invalid command/arguments.
             if (!argParser.Commands.Any(x => x.Name == args[0]) && args[0] != "--help")
             {
                 Console.WriteLine("Error: Invalid command given.");

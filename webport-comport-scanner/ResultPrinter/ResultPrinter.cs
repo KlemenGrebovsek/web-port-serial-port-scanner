@@ -9,7 +9,7 @@ namespace webport_comport_scanner.Printer
     public class ResultPrinter : IResultPrinter
     {
         const string portColumnHeader = "PORT";
-        const string statusColumnHeader = "STATUS";
+        const string portStatusColumnHeader = "STATUS";
 
         public void PrintTable(IEnumerable<IPrintableScanResult> scanResults)
         {
@@ -24,13 +24,13 @@ namespace webport_comport_scanner.Printer
             int maxPrintLenColumn = scanResults.Max(x => x.GetMaxPrintLenght());
 
             maxPrintLenColumn = (portColumnHeader.Length > maxPrintLenColumn) ? portColumnHeader.Length : maxPrintLenColumn;
-            maxPrintLenColumn = (statusColumnHeader.Length > maxPrintLenColumn) ? statusColumnHeader.Length : maxPrintLenColumn;
+            maxPrintLenColumn = (portStatusColumnHeader.Length > maxPrintLenColumn) ? portStatusColumnHeader.Length : maxPrintLenColumn;
             maxPrintLenColumn = (maxPrintLenColumn < 10) ? 10 : maxPrintLenColumn;
 
             string tableLine = $"+{new string('-', (maxPrintLenColumn * 2) + 1 )}+";
 
             Console.WriteLine($"\n {FillStringToLenght(portColumnHeader, maxPrintLenColumn)}" +
-                $" {FillStringToLenght(statusColumnHeader, maxPrintLenColumn)} ");
+                $" {FillStringToLenght(portStatusColumnHeader, maxPrintLenColumn)} ");
 
             for (int i = 0; i < printColSize; i++)
             {

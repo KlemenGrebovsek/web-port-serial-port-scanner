@@ -3,28 +3,32 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-using webport_comport_scanner.Options;
 using webport_comport_scanner.Models;
 using System.Linq;
 
 namespace webport_comport_scanner.Scanners
 {
+    /// <summary>
+    /// Scans for web ports and their status. 
+    /// Returns only ports that are in use or in unknown state.
+    /// </summary>
     public class WebPortScanner : IPortScanner
     {
-        public IEnumerable<IPrintableScanResult> Scan(ProgramOptions options)
+        public IEnumerable<IPrintableScanResult> Scan(int minPort, int maxPort)
         {
-            if (options.MaxPort < options.MinPort)
+            if (maxPort < minPort)
                 return Enumerable.Empty<IPrintableScanResult>();
 
-            return CheckPortsStatus(options)
+            return CheckPortsStatus(minPort, maxPort)
                 .Result
                 .Where(x => x.GetStatusEnum() != PortStatus.FREE);
         }
-        private async Task<IEnumerable<WebPortStatus>> CheckPortsStatus(ProgramOptions options)
-        {
-            List<Task<WebPortStatus>> checkPortStatusTaskCollection = new List<Task<WebPortStatus>>(options.MaxPort - options.MinPort);
 
-            for (int currPort = options.MinPort; currPort <= options.MaxPort; currPort++)
+        private async Task<IEnumerable<WebPortStatus>> CheckPortsStatus(int minPort, int maxPort)
+        {
+            List<Task<WebPortStatus>> checkPortStatusTaskCollection = new List<Task<WebPortStatus>>(maxPort - minPort);
+
+            for (int currPort = minPort; currPort <= maxPort; currPort++)
                 checkPortStatusTaskCollection.Add(CheckPort(currPort));
 
             return await Task.WhenAll(checkPortStatusTaskCollection);

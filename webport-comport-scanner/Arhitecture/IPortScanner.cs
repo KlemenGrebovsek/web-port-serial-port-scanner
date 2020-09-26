@@ -1,16 +1,16 @@
 ﻿using System.Collections.Generic;
 using webport_comport_scanner.Models;
-using webport_comport_scanner.Options;
 
 namespace webport_comport_scanner.Scanners
 {
-    interface IPortScanner
+    public interface IPortScanner
     {
         /// <summary>
         /// Scans ports and returns thier status.
         /// </summary>
-        /// <param name="options">Program options generated from args parser.</param>
+        /// <param name="minPort">Representing minimum port of scanning.</param>
+        /// <param name="maxPort">Representing maximum port of scanning.</param>
         /// <returns>Collection of scan status.</returns>
-        public IEnumerable<IPrintableScanResult> Scan(ProgramOptions options);
+        public IEnumerable<IPrintableScanResult> Scan(int minPort, int maxPort);
     }
 }
