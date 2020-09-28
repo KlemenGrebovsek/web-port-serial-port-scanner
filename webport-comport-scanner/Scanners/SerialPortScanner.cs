@@ -19,8 +19,9 @@ namespace webport_comport_scanner.Scanners
         /// <exception cref="Exception">If scan of ports can't be started or any other reason.</exception>
         /// <param name="minPort">Minimum port (including).</param>
         /// <param name="maxPort">Maximum port (including).</param>
+        /// <param name="status">Filter ports by this status.</param>
         /// <returns>A collection of serial port status in range of (min-max).</returns>
-        public IEnumerable<IPrintablePortStatus> Scan(int minPort, int maxPort)
+        public IEnumerable<IPrintablePortStatus> Scan(int minPort, int maxPort, PortStatus status)
         {
             if (maxPort < minPort)
                 throw new ArgumentException("Max port cannot be less than min port.");
@@ -33,7 +34,6 @@ namespace webport_comport_scanner.Scanners
 
             try
             {
-                // Get ports in range of [min-max].
                 seriaPortNames = SerialPort.GetPortNames()
                 .Where(x => int.Parse(x.Substring(3)) >= minPort && int.Parse(x.Substring(3)) <= maxPort);
             }
@@ -42,7 +42,12 @@ namespace webport_comport_scanner.Scanners
             if (seriaPortNames == null || !seriaPortNames.Any())
                 throw new Exception("No serial ports found.");
 
-            return GetStatus(seriaPortNames);
+            IEnumerable<SerialPortStatus> printablePorts = GetStatus(seriaPortNames);
+
+            if (status != PortStatus.ANY)
+                return printablePorts.Where(x => x.GetStatusEnum() == status);
+                
+            return printablePorts;
         }
 
         /// <summary>

@@ -1,4 +1,5 @@
 using FluentValidation;
+using webport_comport_scanner.Models;
 using webport_comport_scanner.Options;
 
 namespace webport_comport_scanner.Validators

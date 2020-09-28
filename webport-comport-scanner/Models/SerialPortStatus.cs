@@ -24,6 +24,11 @@
             return status.ToString();
         }
 
+        public PortStatus GetStatusEnum()
+        {
+            return status;
+        }
+
         public int GetMaxPrintLenght()
         {
             int nameLen = name.Length;

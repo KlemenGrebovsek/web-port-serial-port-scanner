@@ -7,6 +7,7 @@ using System.Linq;
 using webport_comport_scanner.Printer;
 using webport_comport_scanner.Arhitecture;
 using webport_comport_scanner.Validators;
+using webport_comport_scanner.Models;
 
 namespace webport_comport_scanner.Parser
 {
@@ -38,7 +39,8 @@ namespace webport_comport_scanner.Parser
                 .OnExecuting((o) => 
                 {
                     Console.WriteLine("Scanning web ports...");
-                    new ResultPrinter().PrintTable(new WebPortScanner().Scan(o.MinPort, o.MaxPort));
+                    new ResultPrinter().PrintTable(new WebPortScanner().Scan(o.MinPort, o.MaxPort, ParseStatus(o.Status)));
+                    Console.WriteLine("\nDone!");
                 });
 
             argParser.AddCommand()
@@ -48,7 +50,8 @@ namespace webport_comport_scanner.Parser
                 .OnExecuting((o) => 
                 {   
                     Console.WriteLine("Scanning serial ports...");
-                    new ResultPrinter().PrintTable(new SerialPortScanner().Scan(o.MinPort, o.MaxPort));
+                    new ResultPrinter().PrintTable(new SerialPortScanner().Scan(o.MinPort, o.MaxPort, ParseStatus(o.Status)));
+                    Console.WriteLine("\nDone!");
                 });
 
             argParser.AddCommand()
@@ -80,6 +83,21 @@ namespace webport_comport_scanner.Parser
             }
 
             argParser.Parse(args);
+        }
+
+        /// <summary>
+        /// A string representing interpretation of port status.
+        /// </summary>
+        /// <exception cref="ArgumentException">If status value is invalid.</exception>
+        /// <param name="status"></param>
+        /// <returns>Enum type of port status.</returns>
+        private PortStatus ParseStatus(string status){
+            PortStatus portStatus;
+
+            if (!Enum.TryParse(status.ToUpper(), out portStatus))
+                throw new ArgumentException("Invalid status.");
+
+            return portStatus;
         }
     }
 }

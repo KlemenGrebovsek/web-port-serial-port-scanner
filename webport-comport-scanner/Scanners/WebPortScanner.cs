@@ -21,8 +21,9 @@ namespace webport_comport_scanner.Scanners
         /// <exception cref="Exception">If scan of ports can't be started or any other reason.</exception>
         /// <param name="minPort">Minimum port (including).</param>
         /// <param name="maxPort">Maximum port (including).</param>
-        /// <returns>A collection of type web port status (in use or in unknown state & in range of [min-max]).</returns>
-        public IEnumerable<IPrintablePortStatus> Scan(int minPort, int maxPort)
+        /// <param name="status">Filter ports by this status.</param>
+        /// <returns>A collection of type web port status (in use or in unknown state and in range of [min-max]).</returns>
+        public IEnumerable<IPrintablePortStatus> Scan(int minPort, int maxPort, PortStatus status)
         {
             if (maxPort < minPort)
                 throw new ArgumentException("Max port cannot be less than min port.");
@@ -35,7 +36,12 @@ namespace webport_comport_scanner.Scanners
             if (iPHostEntry.AddressList.Length < 1)
                 throw new Exception("Web port scan couldn't be started.");
 
-            return GetPortsStatus(iPHostEntry.AddressList[0], minPort, maxPort);     
+            IEnumerable<WebPortStatus> printablePorts = GetPortsStatus(iPHostEntry.AddressList[0], minPort, maxPort);
+
+            if (status != PortStatus.ANY)
+                return printablePorts.Where(x => x.GetStatusEnum() == status);
+                
+            return printablePorts;
         }
 
         /// <summary>
@@ -61,7 +67,7 @@ namespace webport_comport_scanner.Scanners
             } catch (AggregateException) {}
 
             if (t.Status == TaskStatus.RanToCompletion)
-                scanResults = t.Result.Where(x => x.GetStatusEnum() != PortStatus.FREE);
+                scanResults = t.Result;
             else
                 scanResults = Enumerable.Empty<WebPortStatus>();
 
