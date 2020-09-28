@@ -6,11 +6,11 @@ namespace webport_comport_scanner.Scanners
     public interface IPortScanner
     {
         /// <summary>
-        /// Scans ports and returns thier status.
+        /// Scans for ports and their status.
         /// </summary>
-        /// <param name="minPort">Representing minimum port of scanning.</param>
-        /// <param name="maxPort">Representing maximum port of scanning.</param>
-        /// <returns>Collection of scan status.</returns>
-        public IEnumerable<IPrintableScanResult> Scan(int minPort, int maxPort);
+        /// <param name="minPort">Minimum port (including).</param>
+        /// <param name="maxPort">Maximum port (including).</param>
+        /// <returns>A collection of type IPrintablePortStatus.</returns>
+        IEnumerable<IPrintablePortStatus> Scan(int minPort, int maxPort);
     }
 }

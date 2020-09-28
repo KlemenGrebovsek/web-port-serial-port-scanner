@@ -6,20 +6,22 @@ using System.Collections.Generic;
 
 namespace webport_comport_scanner.Printer
 {
-    public class ResultPrinter : IResultPrinter
+    /// <summary>
+    /// Provides functionality to print port scan results to console.
+    /// </summary>
+    public class ResultPrinter : IPortStatusPrinter
     {
         const string portColumnHeader = "PORT";
         const string portStatusColumnHeader = "STATUS";
 
-        public void PrintTable(IEnumerable<IPrintableScanResult> scanResults)
+        /// <summary>
+        /// Prints a collection of IPrintableScanResult on console as table. 
+        /// </summary>
+        /// <param name="scanResults">A collection of type IPrintableScanResult.</param>
+        public void PrintTable(IEnumerable<IPrintablePortStatus> scanResults)
         {
-            int printColSize = scanResults.Count();
-
-            if (printColSize == 0)
-            {
-                Console.WriteLine("No port found.");
+            if (scanResults == null || !scanResults.Any())
                 return;
-            }
 
             int maxPrintLenColumn = scanResults.Max(x => x.GetMaxPrintLenght());
 
@@ -32,17 +34,23 @@ namespace webport_comport_scanner.Printer
             Console.WriteLine($"\n {FillStringToLenght(portColumnHeader, maxPrintLenColumn)}" +
                 $" {FillStringToLenght(portStatusColumnHeader, maxPrintLenColumn)} ");
 
-            for (int i = 0; i < printColSize; i++)
+            foreach (IPrintablePortStatus result in scanResults)
             {
                 Console.WriteLine(tableLine);
 
-                Console.WriteLine($"|{FillStringToLenght(scanResults.ElementAt(i).GetName(), maxPrintLenColumn)}|" +
-                    $"{FillStringToLenght(scanResults.ElementAt(i).GetStatus(), maxPrintLenColumn)}|");
+                Console.WriteLine($"|{FillStringToLenght(result.GetName(), maxPrintLenColumn)}|" +
+                    $"{FillStringToLenght(result.GetStatus(), maxPrintLenColumn)}|");
             }
 
             Console.WriteLine(tableLine);
         }
 
+        /// <summary>
+        /// Fill string with empty chars to length.
+        /// </summary>
+        /// <param name="value">Value to print.</param>
+        /// <param name="lenght">Column length.</param>
+        /// <returns>A string of length of column filled with empty sequence.</returns>
         private string FillStringToLenght(string value, int lenght)
         {
             return String.Format($"{{0,{lenght * -1}}}", String.Format("{0," +

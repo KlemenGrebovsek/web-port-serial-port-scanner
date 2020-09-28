@@ -4,17 +4,20 @@ using webport_comport_scanner.Options;
 using webport_comport_scanner.Scanners;
 using MatthiWare.CommandLine.Extensions.FluentValidations;
 using System.Linq;
-using MatthiWare.CommandLine.Abstractions.Parsing;
 using webport_comport_scanner.Printer;
 using webport_comport_scanner.Arhitecture;
+using webport_comport_scanner.Validators;
 
 namespace webport_comport_scanner.Parser
 {
-    public class ArgumentParser : IArgumentParser
+    /// <summary>
+    /// Web and serial port args parser.
+    /// </summary>
+    public class ArgumentParserWSP : IArgumentParser
     {
         private CommandLineParser<ProgramOptions> argParser;
 
-        public ArgumentParser()
+        public ArgumentParserWSP()
         {
             argParser = new CommandLineParser<ProgramOptions>(
                 new CommandLineParserOptions
@@ -25,48 +28,40 @@ namespace webport_comport_scanner.Parser
             );
 
             argParser.UseFluentValidations(configurator => 
-                        configurator.AddValidator<ProgramOptions, ProgramOptionValidator>());
+                        configurator.AddValidator<ProgramOptions, PortOptionValidator>());
 
             argParser.AddCommand()
 
                 .Name("webPort")
                 .Required(false)
                 .Description("This command scans web ports.")
-                .OnExecuting((o) => {
-
+                .OnExecuting((o) => 
+                {
                     Console.WriteLine("Scanning web ports...");
-
-                    IPortScanner webPortScanner = new WebPortScanner();
-                    IResultPrinter printer = new ResultPrinter();
-
-                    printer.PrintTable(webPortScanner.Scan(o.MinPort, o.MaxPort));
-                    Console.WriteLine("\nDone!");
+                    new ResultPrinter().PrintTable(new WebPortScanner().Scan(o.MinPort, o.MaxPort));
                 });
 
             argParser.AddCommand()
                 .Name("serialPort")
                 .Required(false)
                 .Description("This command scans serial ports.")
-                .OnExecuting((o) => {
-
+                .OnExecuting((o) => 
+                {   
                     Console.WriteLine("Scanning serial ports...");
-                    IPortScanner serialPortScanner = new SerialPortScanner();
-                    IResultPrinter printer = new ResultPrinter();
-
-                    printer.PrintTable(serialPortScanner.Scan(o.MinPort, o.MaxPort));
-                    Console.WriteLine("\nDone!");
+                    new ResultPrinter().PrintTable(new SerialPortScanner().Scan(o.MinPort, o.MaxPort));
                 });
 
             argParser.AddCommand()
                 .Name("help")
                 .Required(false)
                 .Description("This command displays program options.")
-                .OnExecuting((o) => {
-                    argParser.Printer.PrintUsage();
-                });
-
+                .OnExecuting((o) => argParser.Printer.PrintUsage());
         }
 
+        /// <summary>
+        /// Parses given arguments and starts exectuting commands.
+        /// </summary>
+        /// <param name="args">Program arguments.</param>
         public void Parse(string[] args)
         {
             if(args.Length < 1)
@@ -84,17 +79,7 @@ namespace webport_comport_scanner.Parser
                 return;
             }
 
-            IParserResult<ProgramOptions> parserResult = argParser.Parse(args);
-
-            if (parserResult.HasErrors)
-            {
-                Console.WriteLine("Parse errors:");
-
-                for (int i = 0; i < parserResult.Errors.Count; i++)
-                    Console.WriteLine($"Error({i}) -> {parserResult.Errors.ElementAt(i).Message}");
-
-                argParser.Printer.PrintUsage();
-            }
+            argParser.Parse(args);
         }
     }
 }

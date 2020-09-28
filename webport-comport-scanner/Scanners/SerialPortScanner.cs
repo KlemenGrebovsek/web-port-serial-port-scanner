@@ -1,5 +1,4 @@
 ﻿using System;
-using webport_comport_scanner.Options;
 using System.IO.Ports;
 using webport_comport_scanner.Models;
 using System.Collections.Generic;
@@ -8,47 +7,78 @@ using System.Linq;
 namespace webport_comport_scanner.Scanners
 {
     /// <summary>
-    /// Scans for serial ports and their status.
+    /// Provides functionality of scanning serial ports.
     /// </summary>
     public class SerialPortScanner : IPortScanner
     {
-        public IEnumerable<IPrintableScanResult> Scan(int minPort, int maxPort)
+        /// <summary>
+        /// Scans for serial ports and their status.
+        /// </summary>
+        /// <exception cref="ArgumentException">If min and max port are logically wrong.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">If min and max are outside the port range. </exception>
+        /// <exception cref="Exception">If scan of ports can't be started or any other reason.</exception>
+        /// <param name="minPort">Minimum port (including).</param>
+        /// <param name="maxPort">Maximum port (including).</param>
+        /// <returns>A collection of serial port status in range of (min-max).</returns>
+        public IEnumerable<IPrintablePortStatus> Scan(int minPort, int maxPort)
         {
-            string[] seriaPortNames = SerialPort.GetPortNames();
+            if (maxPort < minPort)
+                throw new ArgumentException("Max port cannot be less than min port.");
 
-            if (seriaPortNames.Length < 1)
-                return Enumerable.Empty<SerialPortStatus>();
+            // Physically there probably won't be more than 265 serial ports at max, but still.
+            if (minPort < 0 || maxPort > 65535)
+                throw new ArgumentOutOfRangeException($"Min and max port ranges should be in range [0-65535].");
 
-            List<SerialPortStatus> serialPortStatusCollection = new List<SerialPortStatus>(seriaPortNames.Length);
+            IEnumerable<string> seriaPortNames = null;
 
-            SerialPort serialPort;
-
-            for (int i = 0; i < seriaPortNames.Length; i++)
+            try
             {
-                serialPort = new SerialPort(seriaPortNames[i]);
+                // Get ports in range of [min-max].
+                seriaPortNames = SerialPort.GetPortNames()
+                .Where(x => int.Parse(x.Substring(3)) >= minPort && int.Parse(x.Substring(3)) <= maxPort);
+            }
+            catch (Exception){}
 
+            if (seriaPortNames == null || !seriaPortNames.Any())
+                throw new Exception("No serial ports found.");
+
+            return GetStatus(seriaPortNames);
+        }
+
+        /// <summary>
+        /// Checks status of serial ports.
+        /// </summary>
+        /// <returns>A collection of serial port status.</returns>
+        private IEnumerable<SerialPortStatus> GetStatus(IEnumerable<string> seriaPortNames)
+        {
+            SerialPort serialPort = default;
+            SerialPortStatus serialPortStatus = default;
+
+            foreach(string portName in seriaPortNames)
+            {
                 try
                 {
+                    serialPort = new SerialPort(portName);
                     serialPort.Open();
-                    serialPortStatusCollection.Add(new SerialPortStatus(seriaPortNames[i], PortStatus.FREE));
+                    serialPortStatus = new SerialPortStatus(portName, PortStatus.FREE);
                 }
                 catch (UnauthorizedAccessException)
                 {
-                    serialPortStatusCollection.Add(new SerialPortStatus(seriaPortNames[i], PortStatus.IN_USE));
+                    serialPortStatus = new SerialPortStatus(portName, PortStatus.IN_USE);
                 }
                 catch (Exception)
                 {
-                    serialPortStatusCollection.Add(new SerialPortStatus(seriaPortNames[i], PortStatus.UNKNOWN));
+                    serialPortStatus = new SerialPortStatus(portName, PortStatus.UNKNOWN);
                 }
                 finally
                 {
                     if (serialPort.IsOpen)
                         serialPort.Close();
                 }
-
             }
 
-            return serialPortStatusCollection;
+            yield return serialPortStatus;
         }
     }
 }
+

@@ -1,4 +1,5 @@
-﻿using webport_comport_scanner.Parser;
+﻿using webport_comport_scanner.Arhitecture;
+using webport_comport_scanner.Parser;
 
 namespace webport_comport_scanner
 {
@@ -6,7 +7,7 @@ namespace webport_comport_scanner
     {
         static void Main(string[] args)
         {
-            ArgumentParser argumentParser = new ArgumentParser();
+            IArgumentParser argumentParser = new ArgumentParserWSP();
             argumentParser.Parse(args);
         }
     }
