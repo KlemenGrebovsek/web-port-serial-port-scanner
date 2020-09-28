@@ -32,7 +32,7 @@ Description: Finds for ports that have that status. (any, free, in_use), default
 
 **Sample args**
 
-1) webPort -f 100 -t 3000 -s 1
+1) webPort -f 100 -t 3000 -s in_use
 2) serialPort -t 6
 3) webPort -s free
 2) serialPort -s any
