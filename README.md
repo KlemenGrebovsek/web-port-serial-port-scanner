@@ -1,26 +1,20 @@
-# web port, serial port - scanner
-Simple console program for scanning web port and serial (com) port status. (v2.0.1)
+# web and serial port scanner
+Simple console program for scanning web port and serial port status.
 
 <br/>
 
-**Available arguments:**
+**Commands:**
 
-***serialPort***
+- serialPort (Scans serial ports.)
 
-Description: Scans serial ports. 
+- webPort (Scans web ports.) 
 
-Attributes: /
+- help (Displays program options.)
 
-***webPort***
+<br/>
 
-Description: Scans web ports. 
+**Command options**
 
-Attributes:
+-f --from Program scans ports that are equal or greater than this value (0 - 65535), default value is 0.
 
--f --from Program scans ports that are equal or greater than this value (0 - 65535).
-
--t --to Program scans ports that are equal or less than this value (0 - 65535).
-
-***help***
-
-Description: Displays program options.
+-t --to Program scans ports that are equal or less than this value (0 - 65535), default value is 65535.
