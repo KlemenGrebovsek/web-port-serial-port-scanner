@@ -39,7 +39,7 @@ namespace webport_comport_scanner.Parser
                 .OnExecuting((o) => 
                 {
                     Console.WriteLine("Scanning web ports...");
-                    new ResultPrinter().PrintTable(new WebPortScanner().Scan(o.MinPort, o.MaxPort, ParseStatus(o.Status)));
+                    new PortStatusPrinter().PrintTable(new WebPortScanner().Scan(o.MinPort, o.MaxPort, ParseStatus(o.Status)));
                     Console.WriteLine("\nDone!");
                 });
 
@@ -50,7 +50,7 @@ namespace webport_comport_scanner.Parser
                 .OnExecuting((o) => 
                 {   
                     Console.WriteLine("Scanning serial ports...");
-                    new ResultPrinter().PrintTable(new SerialPortScanner().Scan(o.MinPort, o.MaxPort, ParseStatus(o.Status)));
+                    new PortStatusPrinter().PrintTable(new SerialPortScanner().Scan(o.MinPort, o.MaxPort, ParseStatus(o.Status)));
                     Console.WriteLine("\nDone!");
                 });
 

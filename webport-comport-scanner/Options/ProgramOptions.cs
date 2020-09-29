@@ -19,7 +19,7 @@ namespace webport_comport_scanner.Options
 
         [Name("s", "status")]
         [Description("Finds for ports that have that status. (any, free, in_use).")]
-        [DefaultValue(2)]
+        [DefaultValue("any")]
         public string Status { get; set; }
 
     }

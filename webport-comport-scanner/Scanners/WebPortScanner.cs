@@ -36,12 +36,12 @@ namespace webport_comport_scanner.Scanners
             if (iPHostEntry.AddressList.Length < 1)
                 throw new Exception("Web port scan couldn't be started.");
 
-            IEnumerable<WebPortStatus> printablePorts = GetPortsStatus(iPHostEntry.AddressList[0], minPort, maxPort);
+            IEnumerable<WebPortStatus> scanResult = GetPortsStatus(iPHostEntry.AddressList[0], minPort, maxPort);
 
             if (status != PortStatus.ANY)
-                return printablePorts.Where(x => x.GetStatusEnum() == status);
+                return scanResult.Where(x => x.GetStatusEnum() == status);
                 
-            return printablePorts;
+            return scanResult;
         }
 
         /// <summary>
@@ -60,14 +60,14 @@ namespace webport_comport_scanner.Scanners
             for (; minPort <= maxPort; minPort++)
                 checkPortStatusTaskCollection.Add(CheckPortTask(address, minPort));
 
-            Task<WebPortStatus[]> t = Task.WhenAll(checkPortStatusTaskCollection);
+            Task<WebPortStatus[]> waitAllTasks = Task.WhenAll(checkPortStatusTaskCollection);
 
             try{
-                t.Wait();
+                waitAllTasks.Wait();
             } catch (AggregateException) {}
 
-            if (t.Status == TaskStatus.RanToCompletion)
-                scanResults = t.Result;
+            if (waitAllTasks.Status == TaskStatus.RanToCompletion)
+                scanResults = waitAllTasks.Result;
             else
                 scanResults = Enumerable.Empty<WebPortStatus>();
 
