@@ -3,7 +3,7 @@
     public interface IPrintablePortStatus
     {
         /// <summary>
-        /// Calculates maximum length of print string for this object.
+        /// Gets maximum length of print string for this object.
         /// </summary>
         /// <returns>An integer representing maximum length of print string.</returns>
         public int GetMaxPrintLenght();

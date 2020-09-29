@@ -91,7 +91,8 @@ namespace webport_comport_scanner.Parser
         /// <exception cref="ArgumentException">If status value is invalid.</exception>
         /// <param name="status"></param>
         /// <returns>Enum type of port status.</returns>
-        private PortStatus ParseStatus(string status){
+        private PortStatus ParseStatus(string status)
+        {
             PortStatus portStatus;
 
             if (!Enum.TryParse(status.ToUpper(), out portStatus))

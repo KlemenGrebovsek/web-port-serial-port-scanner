@@ -8,7 +8,7 @@ namespace webport_comport_scanner.Arhitecture
         /// <summary>
         /// Prints collection of port status as a table.
         /// </summary>
-        /// <param name="data">Collection of port status </param>
-        void PrintTable(IEnumerable<IPrintablePortStatus> data);
+        /// <param name="portStatusData">A collection of type printable port status.</param>
+        void PrintTable(IEnumerable<IPrintablePortStatus> portStatusData);
     }
 }

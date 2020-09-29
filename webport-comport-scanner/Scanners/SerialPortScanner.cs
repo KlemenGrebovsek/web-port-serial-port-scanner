@@ -30,7 +30,7 @@ namespace webport_comport_scanner.Scanners
             if (minPort < 0 || maxPort > 65535)
                 throw new ArgumentOutOfRangeException($"Min and max port ranges should be in range [0-65535].");
 
-            IEnumerable<string> seriaPortNames = null;
+            IEnumerable<string> seriaPortNames = default;
 
             try
             {
@@ -39,10 +39,10 @@ namespace webport_comport_scanner.Scanners
             }
             catch (Exception){}
 
-            if (seriaPortNames == null || !seriaPortNames.Any())
+            if (seriaPortNames == default || !seriaPortNames.Any())
                 throw new Exception("No serial ports found.");
 
-            IEnumerable<SerialPortStatus> scanResult = GetStatus(seriaPortNames);
+            IEnumerable<SerialPortStatus> scanResult = GetPortStatus(seriaPortNames);
 
             if (status != PortStatus.ANY)
                 return scanResult.Where(x => x.GetStatusEnum() == status);
@@ -54,7 +54,7 @@ namespace webport_comport_scanner.Scanners
         /// Checks status of serial ports.
         /// </summary>
         /// <returns>A collection of serial port status.</returns>
-        private IEnumerable<SerialPortStatus> GetStatus(IEnumerable<string> seriaPortNames)
+        private IEnumerable<SerialPortStatus> GetPortStatus(IEnumerable<string> seriaPortNames)
         {
             SerialPort serialPort = default;
             SerialPortStatus serialPortStatus = default;
@@ -77,7 +77,7 @@ namespace webport_comport_scanner.Scanners
                 }
                 finally
                 {
-                    if (serialPort.IsOpen)
+                    if (serialPort != default && serialPort.IsOpen)
                         serialPort.Close();
                 }
             }
