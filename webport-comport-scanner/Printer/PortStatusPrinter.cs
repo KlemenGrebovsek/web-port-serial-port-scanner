@@ -50,7 +50,7 @@ namespace webport_comport_scanner.Printer
         }
 
         /// <summary>
-        /// Calculates best column width for this print event.
+        /// Calculates best column width for this data set.
         /// </summary>
         /// <param name="maxValueWidth">Length of longest value in table.</param>
         /// <returns>An integer, recommended column width.</returns>

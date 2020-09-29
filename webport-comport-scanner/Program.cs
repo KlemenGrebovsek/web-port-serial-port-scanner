@@ -7,7 +7,6 @@ namespace webport_comport_scanner
     {
         static void Main(string[] args)
         {
-            args = new string[] {"webPort", "-s", "free"};
             IArgumentParser argumentParser = new ArgumentParserWSP();
             argumentParser.Parse(args);
         }

@@ -42,12 +42,12 @@ namespace webport_comport_scanner.Scanners
             if (seriaPortNames == null || !seriaPortNames.Any())
                 throw new Exception("No serial ports found.");
 
-            IEnumerable<SerialPortStatus> printablePorts = GetStatus(seriaPortNames);
+            IEnumerable<SerialPortStatus> scanResult = GetStatus(seriaPortNames);
 
             if (status != PortStatus.ANY)
-                return printablePorts.Where(x => x.GetStatusEnum() == status);
+                return scanResult.Where(x => x.GetStatusEnum() == status);
                 
-            return printablePorts;
+            return scanResult;
         }
 
         /// <summary>
