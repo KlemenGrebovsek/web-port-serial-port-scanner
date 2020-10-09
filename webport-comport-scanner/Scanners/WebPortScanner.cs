@@ -22,8 +22,8 @@ namespace webport_comport_scanner.Scanners
         /// <param name="minPort">Minimum port (including).</param>
         /// <param name="maxPort">Maximum port (including).</param>
         /// <param name="status">Filter ports by this status.</param>
-        /// <returns>A collection of type web port status (in use or in unknown state and in range of [min-max]).</returns>
-        public IEnumerable<IPrintablePortStatus> Scan(int minPort, int maxPort, PortStatus status)
+        /// <returns>A collection of type web port status in range of [min-max].</returns>
+        public IEnumerable<IPrintablePortStatus> ScanStatus(int minPort, int maxPort, PortStatus status)
         {
             if (maxPort < minPort)
                 throw new ArgumentException("Max port cannot be less than min port.");
@@ -50,66 +50,61 @@ namespace webport_comport_scanner.Scanners
         /// <param name="address">IP address.</param>
         /// <param name="minPort">Minimum port (including).</param>
         /// <param name="maxPort">Maximum port (including).</param>
+        /// <exception cref="AggregateException">If any task within method was canceled.</exception>
+        /// <exception cref="ObjectDisposableException">If any task within method was disposed while being in use.</exception>
+        /// <exception cref="Exception">If any task failed for unknown reason.</exception>
         /// <returns>A collection of web port status in range (min-max).</returns>
         private IEnumerable<WebPortStatus> GetPortsStatus(IPAddress address, int minPort, int maxPort)
         {
-            IEnumerable<WebPortStatus> scanResults;
+            List<Task<WebPortStatus>> scanTasks = new List<Task<WebPortStatus>>(maxPort - minPort);
 
-            List<Task<WebPortStatus>> checkPortStatusTaskCollection = new List<Task<WebPortStatus>>(maxPort - minPort);
+            for (; minPort < maxPort; minPort++)
+                scanTasks.Add(Task.FromResult(GetPortStatus(address, minPort)));
 
-            for (; minPort <= maxPort; minPort++)
-                checkPortStatusTaskCollection.Add(CheckPortTask(address, minPort));
+            Task<WebPortStatus[]> masterTask = Task.WhenAll(scanTasks);
 
-            Task<WebPortStatus[]> waitAllTasks = Task.WhenAll(checkPortStatusTaskCollection);
+            masterTask.Wait();
 
-            try{
-                waitAllTasks.Wait();
-            } catch (AggregateException) {}
+            if (masterTask.Status != TaskStatus.RanToCompletion)
+                throw new Exception($"Ran into problem ({masterTask.Exception.InnerException.Message})" +
+                        "while trying to scan web port status.");
 
-            if (waitAllTasks.Status == TaskStatus.RanToCompletion)
-                scanResults = waitAllTasks.Result;
-            else
-                scanResults = Enumerable.Empty<WebPortStatus>();
-
-            return scanResults;
+            return masterTask.Result;
         }
 
         /// <summary>
-        /// Creates task which checks status of given port.
+        /// Checks status of given port.
         /// </summary>
-        /// <param name="address">Ip address.</param>
+        /// <param name="address">Host ip address.</param>
         /// <param name="port">Port number.</param>
         /// <returns>Port status.</returns>
-        private Task<WebPortStatus> CheckPortTask(IPAddress address, int port)
+        private WebPortStatus GetPortStatus(IPAddress address, int port)
         {
-            return Task.Run(() =>
+            TcpListener tcpListener = default;
+            WebPortStatus portStatus;
+
+            try
             {
-                TcpListener tcpListener = default;
-                WebPortStatus portStatus;
+                tcpListener = new TcpListener(address, port);
+                tcpListener.Start();
 
-                try
-                {
-                    tcpListener = new TcpListener(address, port);
-                    tcpListener.Start();
+                portStatus = new WebPortStatus(port, PortStatus.FREE);
+            }
+            catch (SocketException)
+            {
+                portStatus = new WebPortStatus(port, PortStatus.IN_USE);
+            }
+            catch (Exception)
+            {
+                portStatus = new WebPortStatus(port, PortStatus.UNKNOWN);
+            }
+            finally
+            {
+                if (tcpListener != default)
+                    tcpListener.Stop();
+            }
 
-                    portStatus = new WebPortStatus(port, PortStatus.FREE);
-                }
-                catch (SocketException)
-                {
-                    portStatus = new WebPortStatus(port, PortStatus.IN_USE);
-                }
-                catch (Exception)
-                {
-                    portStatus = new WebPortStatus(port, PortStatus.UNKNOWN);
-                }
-                finally
-                {
-                    if (tcpListener != default)
-                        tcpListener.Stop();
-                }
-
-                return portStatus;
-            });
+            return portStatus;   
         }
     }
 }

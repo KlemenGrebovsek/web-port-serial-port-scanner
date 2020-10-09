@@ -1,7 +1,7 @@
 ﻿namespace webport_comport_scanner.Models
 {
     /// <summary>
-    /// Contains status of serial port.
+    /// Represents serial port and its status.
     /// </summary>
     public class SerialPortStatus : IPrintablePortStatus
     {
@@ -31,10 +31,9 @@
 
         public int GetMaxPrintLenght()
         {
-            int nameLen = name.Length;
             int statusLen = status.ToString().Length;
 
-            return (nameLen > statusLen) ? nameLen : statusLen;
+            return (name.Length > statusLen) ? name.Length : statusLen;
         }
  
     }

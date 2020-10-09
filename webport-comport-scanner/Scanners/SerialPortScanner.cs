@@ -20,29 +20,29 @@ namespace webport_comport_scanner.Scanners
         /// <param name="minPort">Minimum port (including).</param>
         /// <param name="maxPort">Maximum port (including).</param>
         /// <param name="status">Filter ports by this status.</param>
-        /// <returns>A collection of serial port status in range of (min-max).</returns>
-        public IEnumerable<IPrintablePortStatus> Scan(int minPort, int maxPort, PortStatus status)
+        /// <returns>A collection of type serial port status in range of [min-max].</returns>
+        public IEnumerable<IPrintablePortStatus> ScanStatus(int minPort, int maxPort, PortStatus status)
         {
             if (maxPort < minPort)
                 throw new ArgumentException("Max port cannot be less than min port.");
 
-            // Physically there probably won't be more than 265 serial ports at max, but still.
+            // Physically there probably won't be more than 265 serial ports at max, but anyway.
             if (minPort < 0 || maxPort > 65535)
                 throw new ArgumentOutOfRangeException($"Min and max port ranges should be in range [0-65535].");
 
-            IEnumerable<string> seriaPortNames = default;
+            IEnumerable<string> seriaPorts = default;
 
             try
             {
-                seriaPortNames = SerialPort.GetPortNames()
+                seriaPorts = SerialPort.GetPortNames()
                 .Where(x => int.Parse(x.Substring(3)) >= minPort && int.Parse(x.Substring(3)) <= maxPort);
             }
             catch (Exception){}
 
-            if (seriaPortNames == default || !seriaPortNames.Any())
+            if (seriaPorts == default || !seriaPorts.Any())
                 throw new Exception("No serial ports found.");
 
-            IEnumerable<SerialPortStatus> scanResult = GetPortStatus(seriaPortNames);
+            IEnumerable<SerialPortStatus> scanResult = GetPortStatus(seriaPorts);
 
             if (status != PortStatus.ANY)
                 return scanResult.Where(x => x.GetStatusEnum() == status);
@@ -54,12 +54,12 @@ namespace webport_comport_scanner.Scanners
         /// Checks status of serial ports.
         /// </summary>
         /// <returns>A collection of serial port status.</returns>
-        private IEnumerable<SerialPortStatus> GetPortStatus(IEnumerable<string> seriaPortNames)
+        private IEnumerable<SerialPortStatus> GetPortStatus(IEnumerable<string> seriaPorts)
         {
             SerialPort serialPort = default;
             SerialPortStatus serialPortStatus = default;
 
-            foreach(string portName in seriaPortNames)
+            foreach(string portName in seriaPorts)
             {
                 try
                 {

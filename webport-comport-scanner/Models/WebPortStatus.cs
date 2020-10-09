@@ -1,7 +1,7 @@
 ﻿namespace webport_comport_scanner.Models
 {
     /// <summary>
-    /// Contains status of web port.
+    /// Represents web port and its status.
     /// </summary>
     public class WebPortStatus : IPrintablePortStatus
     {
