@@ -12,6 +12,6 @@ namespace webport_comport_scanner.Scanners
         /// <param name="maxPort">Maximum port (including).</param>
         /// <param name="status">Filter ports by this status.</param>
         /// <returns>A collection of type printable port status.</returns>
-        IEnumerable<IPrintablePortStatus> ScanStatus(int minPort, int maxPort, PortStatus status);
+        IEnumerable<IPrintablePortStatus> Scan(int minPort, int maxPort, PortStatus status);
     }
 }

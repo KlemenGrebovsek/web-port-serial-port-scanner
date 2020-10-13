@@ -23,7 +23,7 @@ namespace webport_comport_scanner.Scanners
         /// <param name="maxPort">Maximum port (including).</param>
         /// <param name="status">Filter ports by this status.</param>
         /// <returns>A collection of type web port status in range of [min-max].</returns>
-        public IEnumerable<IPrintablePortStatus> ScanStatus(int minPort, int maxPort, PortStatus status)
+        public IEnumerable<IPrintablePortStatus> Scan(int minPort, int maxPort, PortStatus status)
         {
             if (maxPort < minPort)
                 throw new ArgumentException("Max port cannot be less than min port.");
@@ -66,8 +66,8 @@ namespace webport_comport_scanner.Scanners
             masterTask.Wait();
 
             if (masterTask.Status != TaskStatus.RanToCompletion)
-                throw new Exception($"Ran into problem ({masterTask.Exception.InnerException.Message})" +
-                        "while trying to scan web port status.");
+                throw new Exception("Ran into problem while trying to scan web port status:" +
+                                                $"{masterTask.Exception.InnerException.Message}");
 
             return masterTask.Result;
         }

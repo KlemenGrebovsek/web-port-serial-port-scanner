@@ -17,7 +17,7 @@ namespace webport_comport_scanner.Test
 
             try
             {
-                serialPortScanner.ScanStatus(-1, 100, PortStatus.ANY);
+                serialPortScanner.Scan(-1, 100, PortStatus.ANY);
             }
             catch (Exception){
                 exceptionThrown = true;
@@ -35,7 +35,7 @@ namespace webport_comport_scanner.Test
 
             try
             {
-                serialPortScanner.ScanStatus(10, 99999, PortStatus.ANY);
+                serialPortScanner.Scan(10, 99999, PortStatus.ANY);
             }
             catch (Exception){
                 exceptionThrown = true;
@@ -52,7 +52,7 @@ namespace webport_comport_scanner.Test
 
             try
             {
-                serialPortScanner.ScanStatus(30, 15, PortStatus.ANY);
+                serialPortScanner.Scan(30, 15, PortStatus.ANY);
             }
             catch (Exception){
                 exceptionThrown = true;
@@ -72,7 +72,7 @@ namespace webport_comport_scanner.Test
 
             try
             {
-                scanResult = serialPortScanner.ScanStatus(0, 65535, status);
+                scanResult = serialPortScanner.Scan(0, 65535, status);
             }
             catch (Exception)
             {
@@ -95,7 +95,7 @@ namespace webport_comport_scanner.Test
 
             try
             {
-                scanResult = WebPortScanner.ScanStatus(minPort, maxPort, PortStatus.ANY);
+                scanResult = WebPortScanner.Scan(minPort, maxPort, PortStatus.ANY);
             }
             catch (Exception)
             {
