@@ -60,6 +60,7 @@ namespace webport_comport_scanner.Scanners
                 {
                     serialPort = new SerialPort(portName);
                     serialPort.Open();
+                    serialPortStatus = new SerialPortStatus(portName, PortStatus.FREE);
                 }
                 catch (UnauthorizedAccessException)
                 {
@@ -74,8 +75,6 @@ namespace webport_comport_scanner.Scanners
                     if (serialPort != default && serialPort.IsOpen)
                         serialPort.Close();
                 }
-                
-                serialPortStatus = new SerialPortStatus(portName, PortStatus.FREE);
             }
 
             yield return serialPortStatus;
