@@ -10,74 +10,58 @@ namespace webport_comport_scanner.Test
     public class WebPortScannerTest
     {
         [Fact]
-        public void TestMinPortLimit()
+        public void Test_MinPortLimit()
         {
-            WebPortScanner WebPortScanner = new WebPortScanner();
-            bool exceptionThrown = false;
-
-            try
-            {
-                WebPortScanner.Scan(-1, 100, PortStatus.ANY);
-            }
-            catch (Exception){
-                exceptionThrown = true;
-            }
-            
-            Assert.True(exceptionThrown);
-        }
-
-
-        [Fact]
-        public void TestMaxPortLimit()
-        {
-            WebPortScanner WebPortScanner = new WebPortScanner();
-            bool exceptionThrown = false;
-
-            try
-            {
-                WebPortScanner.Scan(10, 99999, PortStatus.ANY);
-            }
-            catch (Exception){
-                exceptionThrown = true;
-            }
-            
-            Assert.True(exceptionThrown);
+            IPortScanner webPortScanner = new WebPortScanner();
+            Assert.Throws<ArgumentOutOfRangeException>(() => webPortScanner.Scan(-1, 100, PortStatus.ANY));
         }
 
         [Fact]
-        public void TestInvalidPortScanRange()
+        public void Test_MaxPortLimit()
         {
-            WebPortScanner WebPortScanner = new WebPortScanner();
-            bool exceptionThrown = false;
+            IPortScanner webPortScanner = new WebPortScanner();
+            Assert.Throws<ArgumentOutOfRangeException>(() => webPortScanner.Scan(10, 65536, PortStatus.ANY));
+        }
 
+        [Fact]
+        public void Test_InvalidPortScanRange()
+        {
+            IPortScanner webPortScanner = new WebPortScanner();
+            Assert.Throws<ArgumentException>(() => webPortScanner.Scan(30, 15, PortStatus.ANY));
+        }
+
+        [Fact]
+        public void Test_ValidPortScanRange()
+        {
+            IPortScanner webPortScanner = new WebPortScanner();
+            
             try
             {
-                WebPortScanner.Scan(30, 15, PortStatus.ANY);
+                webPortScanner.Scan(15, 30, PortStatus.ANY);
+                Assert.True(true);
             }
-            catch (Exception){
-                exceptionThrown = true;
+            catch (Exception e)
+            {
+               Assert.True(false, e.Message);
             }
-            
-            Assert.True(exceptionThrown);
         }
 
         [Theory]
         [InlineData(PortStatus.FREE)]
         [InlineData(PortStatus.IN_USE)]
         [InlineData(PortStatus.UNKNOWN)]
-        public void TestValidPortStatus(PortStatus status)
+        public void Test_ValidPortStatus(PortStatus status)
         {
-            WebPortScanner WebPortScanner = new WebPortScanner();
-            IEnumerable<IPrintablePortStatus> scanResult;
+            IPortScanner WebPortScanner = new WebPortScanner();
+            IEnumerable<IPrintablePortStatus> scanResult = default;
 
             try
             {
                 scanResult = WebPortScanner.Scan(0, 65535, status);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                // No web ports found...
-                return;
+                Assert.True(false, e.Message);
             }
             
             string portStatusString = status.ToString();
@@ -88,19 +72,18 @@ namespace webport_comport_scanner.Test
         [InlineData(0, 100)]
         [InlineData(100, 200)]
         [InlineData(150, 500)]
-        public void TestPortScanRange(int minPort, int maxPort)
+        public void Test_PortScanRangeEquals(int minPort, int maxPort)
         {
-            WebPortScanner WebPortScanner = new WebPortScanner();
-            IEnumerable<IPrintablePortStatus> scanResult;
+            IPortScanner WebPortScanner = new WebPortScanner();
+            IEnumerable<IPrintablePortStatus> scanResult = default;
 
             try
             {
                 scanResult = WebPortScanner.Scan(minPort, maxPort, PortStatus.ANY);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                // No web ports found...
-                return;
+                Assert.True(false, e.Message);
             }
             
             Assert.Equal(maxPort - minPort, scanResult.Count());
