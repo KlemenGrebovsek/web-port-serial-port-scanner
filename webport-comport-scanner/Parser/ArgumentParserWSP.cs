@@ -16,11 +16,11 @@ namespace webport_comport_scanner.Parser
     /// </summary>
     public class ArgumentParserWSP : IArgumentParser
     {
-        private CommandLineParser<ProgramOptions> argParser;
+        private CommandLineParser<ProgramOptions> _argParser;
 
         public ArgumentParserWSP()
         {
-            argParser = new CommandLineParser<ProgramOptions>(
+            _argParser = new CommandLineParser<ProgramOptions>(
                 new CommandLineParserOptions
                 {
                     AppName = "Serial and web port scanner.", 
@@ -28,10 +28,10 @@ namespace webport_comport_scanner.Parser
                 }
             );
 
-            argParser.UseFluentValidations(configurator => 
+            _argParser.UseFluentValidations(configurator => 
                         configurator.AddValidator<ProgramOptions, PortOptionValidator>());
 
-            argParser.AddCommand()
+            _argParser.AddCommand()
 
                 .Name("webPort")
                 .Required(false)
@@ -46,7 +46,7 @@ namespace webport_comport_scanner.Parser
                     Console.WriteLine("\nDone!");
                 });
 
-            argParser.AddCommand()
+            _argParser.AddCommand()
                 .Name("serialPort")
                 .Required(false)
                 .Description("This command scans serial ports.")
@@ -60,11 +60,11 @@ namespace webport_comport_scanner.Parser
                     Console.WriteLine("\nDone!");
                 });
 
-            argParser.AddCommand()
+            _argParser.AddCommand()
                 .Name("help")
                 .Required(false)
                 .Description("This command displays program options.")
-                .OnExecuting((o) => argParser.Printer.PrintUsage());
+                .OnExecuting((o) => _argParser.Printer.PrintUsage());
         }
 
         /// <summary>
@@ -76,19 +76,19 @@ namespace webport_comport_scanner.Parser
             if(args.Length < 1)
             {
                 Console.WriteLine("Error: No command or arguments given.");
-                argParser.Printer.PrintUsage();
+                _argParser.Printer.PrintUsage();
                 return;
             }
 
             // check for invalid command/arguments.
-            if (!argParser.Commands.Any(x => x.Name == args[0]) && args[0] != "--help")
+            if (!_argParser.Commands.Any(x => x.Name == args[0]) && args[0] != "--help")
             {
                 Console.WriteLine("Error: Invalid command given.");
-                argParser.Printer.PrintUsage();
+                _argParser.Printer.PrintUsage();
                 return;
             }
 
-            argParser.Parse(args);
+            _argParser.Parse(args);
         }
 
         /// <summary>

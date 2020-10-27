@@ -13,13 +13,13 @@ namespace webport_comport_scanner.Printer
     public class PortStatusPrinter : IPortStatusPrinter
     {
         // Represents first column header text.
-        const string _portHeader = "PORT NAME";
+        private const string _portHeader = "PORT NAME";
 
         // Represents second column header text.
-        const string _statusHeader = "STATUS";
+        private const string _statusHeader = "STATUS";
 
         // Represents min column width (number of chars).
-        const int _minColWidth = 11;
+        private const int _minColWidth = 11;
 
 
         /// <summary>

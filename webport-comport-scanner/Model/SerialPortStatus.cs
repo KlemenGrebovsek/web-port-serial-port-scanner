@@ -5,35 +5,35 @@
     /// </summary>
     public class SerialPortStatus : IPrintablePortStatus
     {
-        private string name;
-        private PortStatus status;
+        private string _name;
+        private PortStatus _status;
 
         public SerialPortStatus(string name, PortStatus status)
         {
-            this.name = name;
-            this.status = status;
+            _name = name;
+            _status = status;
         }
 
         public string GetName()
         {
-            return name;
+            return _name;
         }
 
         public string GetStatus()
         {
-            return status.ToString();
+            return _status.ToString();
         }
 
         public PortStatus GetStatusEnum()
         {
-            return status;
+            return _status;
         }
 
         public int GetMaxPrintLenght()
         {
-            int statusLen = status.ToString().Length;
+            int statusLen = _status.ToString().Length;
 
-            return (name.Length > statusLen) ? name.Length : statusLen;
+            return (_name.Length > statusLen) ? _name.Length : statusLen;
         }
  
     }
