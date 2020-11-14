@@ -1,4 +1,4 @@
-﻿namespace webport_comport_scanner.Models
+﻿namespace webport_comport_scanner.Model
 {
     /// <summary>
     /// Represents current status of port.

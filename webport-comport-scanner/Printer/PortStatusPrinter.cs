@@ -1,9 +1,8 @@
 ﻿using System;
-using webport_comport_scanner.Models;
 using System.Linq;
-using webport_comport_scanner.Arhitecture;
 using System.Collections.Generic;
 using System.Text;
+using webport_comport_scanner.Architecture;
 
 namespace webport_comport_scanner.Printer
 {
@@ -13,41 +12,43 @@ namespace webport_comport_scanner.Printer
     public class PortStatusPrinter : IPortStatusPrinter
     {
         // Represents first column header text.
-        private const string _portHeader = "PORT NAME";
+        private const string PortHeader = "PORT NAME";
 
         // Represents second column header text.
-        private const string _statusHeader = "STATUS";
+        private const string StatusHeader = "STATUS";
 
         // Represents min column width (number of chars).
-        private const int _minColWidth = 11;
+        private const int MinColWidth = 11;
 
 
         /// <summary>
         /// Prints a collection of port status on console as table. 
         /// </summary>
-        /// <param name="portStatusCollection">A collection of type port status.</param>
-        public void PrintTable(IEnumerable<IPrintablePortStatus> portStatusCollection)
+        /// <param name="portStatuses">A collection of type port status.</param>
+        public void PrintTable(IEnumerable<IPrintablePortStatus> portStatuses)
         {
-            if (portStatusCollection == null || !portStatusCollection.Any())
+            if (portStatuses == null)
                 return;
 
-            StringBuilder tableOutput = new StringBuilder(); 
+            var statuses = portStatuses as IPrintablePortStatus[] ?? portStatuses.ToArray();
+            var tableOutput = new StringBuilder(); 
 
             // Idea behind this variable is to get equal width of each column in table.
-            int columnWidth = GetColumnWidth(portStatusCollection.Max(x => x.GetMaxPrintLenght()));
+            
+            var columnWidth = GetColumnWidth(statuses.Max(x => x.GetMaxPrintLen()));
 
             // Define table line which will be printed after each row.
-            string tableLine = $"\n+{new string('-', (columnWidth * 2) + 1 )}+";
+            var tableLine = $"\n+{new string('-', (columnWidth * 2) + 1 )}+";
 
-            tableOutput.Append($"\n {FillStringToLenght(_portHeader, columnWidth)}" +
-                $" {FillStringToLenght(_statusHeader, columnWidth)} ");
+            tableOutput.Append($"\n {FillStringToLen(PortHeader, columnWidth)}" +
+                $" {FillStringToLen(StatusHeader, columnWidth)} ");
 
             // Generate rows of table
-            foreach (IPrintablePortStatus result in portStatusCollection)
+            foreach (var result in statuses)
             {
                 tableOutput.Append(tableLine);
-                tableOutput.Append($"\n|{FillStringToLenght(result.GetName(), columnWidth)}|" +
-                    $"{FillStringToLenght(result.GetStatus(), columnWidth)}|");
+                tableOutput.Append($"\n|{FillStringToLen(result.GetName(), columnWidth)}|" +
+                    $"{FillStringToLen(result.GetStatus(), columnWidth)}|");
             }
 
             tableOutput.Append(tableLine);
@@ -58,38 +59,34 @@ namespace webport_comport_scanner.Printer
         /// <summary>
         /// Calculates recommended column width for this data set.
         /// </summary>
-        /// <param name="maxValueWidth">Length of longest value in table.</param>
+        /// <param name="maxValWidth">Length of longest value in table.</param>
         /// <returns>An integer, recommended column width.</returns>
-        private int GetColumnWidth(int maxValueWidth)
+        private static int GetColumnWidth(int maxValWidth)
         {
-            int recommendedWidth;
+            int recWidth;
 
             // Get max width of table column headers.
-            int maxColHeaderWidth = (_portHeader.Length > _statusHeader.Length) ? _portHeader.Length : _statusHeader.Length;
+            var maxHeaderWidth = PortHeader.Length > StatusHeader.Length ? PortHeader.Length : StatusHeader.Length;
 
             // Width of column shouldn't be less than min width.
-            if (maxValueWidth < _minColWidth && maxColHeaderWidth < _minColWidth)
-            {
-                recommendedWidth = _minColWidth;
-            }
+            if (maxValWidth < MinColWidth && maxHeaderWidth < MinColWidth)
+                recWidth = MinColWidth;
             else
-            {
-                recommendedWidth = (maxColHeaderWidth > maxValueWidth) ? maxColHeaderWidth: maxValueWidth;
-            }
-
-            return recommendedWidth;
+                recWidth = (maxHeaderWidth > maxValWidth) ? maxHeaderWidth: maxValWidth;
+            
+            return recWidth;
         }
 
         /// <summary>
         /// Fill string with empty chars to length.
         /// </summary>
         /// <param name="value">Value to print.</param>
-        /// <param name="lenght">Column length.</param>
+        /// <param name="length">Column length.</param>
         /// <returns>A string of length of column filled with empty sequence.</returns>
-        private string FillStringToLenght(string value, int lenght)
+        private static string FillStringToLen(string value, int length)
         {
-            return String.Format($"{{0,{lenght * -1}}}", String.Format("{0," +
-                ((lenght + value.Length) / 2).ToString() + "}", value));
+            return string.Format($"{{0,{length * -1}}}", string.Format("{0," +
+                ((length + value.Length) / 2).ToString() + "}", value));
         }
     }
 }

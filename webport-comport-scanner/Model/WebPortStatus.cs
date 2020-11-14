@@ -1,24 +1,21 @@
-﻿namespace webport_comport_scanner.Models
+﻿using webport_comport_scanner.Architecture;
+
+namespace webport_comport_scanner.Model
 {
     /// <summary>
     /// Represents web port and its status.
     /// </summary>
     public class WebPortStatus : IPrintablePortStatus
     {
-        private int _port;
-        private PortStatus _status;
+        private readonly int _port;
+        private readonly PortStatus _status;
 
         public WebPortStatus(int port, PortStatus status)
         {
             _port = port;
             _status = status;
         }
-
-        public PortStatus GetPortStatus()
-        {
-            return _status;
-        }
-
+        
         public string GetName()
         {
             return _port.ToString();
@@ -34,10 +31,10 @@
             return _status;
         }
 
-        public int GetMaxPrintLenght()
+        public int GetMaxPrintLen()
         {
-            int nameLen = _port.ToString().Length;
-            int statusLen = _status.ToString().Length;
+            var nameLen = _port.ToString().Length;
+            var statusLen = _status.ToString().Length;
 
             return (nameLen > statusLen) ? nameLen : statusLen;
         }

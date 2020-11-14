@@ -1,4 +1,4 @@
-namespace webport_comport_scanner.Arhitecture
+namespace webport_comport_scanner.Architecture
 {
     public interface IArgumentParser
     {

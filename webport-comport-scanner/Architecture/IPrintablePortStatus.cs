@@ -1,4 +1,4 @@
-﻿namespace webport_comport_scanner.Models
+﻿namespace webport_comport_scanner.Architecture
 {
     public interface IPrintablePortStatus
     {
@@ -6,7 +6,7 @@
         /// Gets maximum length of print string for this object.
         /// </summary>
         /// <returns>An integer representing maximum length of print string.</returns>
-        public int GetMaxPrintLenght();
+        public int GetMaxPrintLen();
 
         /// <summary>
         /// Gets port name as string.

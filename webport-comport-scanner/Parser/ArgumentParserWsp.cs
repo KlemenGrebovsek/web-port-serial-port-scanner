@@ -1,24 +1,24 @@
 ﻿using System;
 using MatthiWare.CommandLine;
-using webport_comport_scanner.Options;
-using webport_comport_scanner.Scanners;
+using webport_comport_scanner.Option;
 using MatthiWare.CommandLine.Extensions.FluentValidations;
 using System.Linq;
+using webport_comport_scanner.Architecture;
+using webport_comport_scanner.Model;
 using webport_comport_scanner.Printer;
-using webport_comport_scanner.Arhitecture;
-using webport_comport_scanner.Validators;
-using webport_comport_scanner.Models;
+using webport_comport_scanner.Scanner;
+using webport_comport_scanner.Validator;
 
 namespace webport_comport_scanner.Parser
 {
     /// <summary>
     /// Web and serial port args parser.
     /// </summary>
-    public class ArgumentParserWSP : IArgumentParser
+    public class ArgumentParserWsp : IArgumentParser
     {
-        private CommandLineParser<ProgramOptions> _argParser;
+        private readonly CommandLineParser<ProgramOptions> _argParser;
 
-        public ArgumentParserWSP()
+        public ArgumentParserWsp()
         {
             _argParser = new CommandLineParser<ProgramOptions>(
                 new CommandLineParserOptions
@@ -81,7 +81,7 @@ namespace webport_comport_scanner.Parser
             }
 
             // check for invalid command/arguments.
-            if (!_argParser.Commands.Any(x => x.Name == args[0]) && args[0] != "--help")
+            if (_argParser.Commands.All(x => x.Name != args[0]) && args[0] != "--help")
             {
                 Console.WriteLine("Error: Invalid command given.");
                 _argParser.Printer.PrintUsage();
@@ -97,11 +97,9 @@ namespace webport_comport_scanner.Parser
         /// <exception cref="ArgumentException">If status value is invalid.</exception>
         /// <param name="status"></param>
         /// <returns>Enum type of port status.</returns>
-        private PortStatus ParseStatus(string status)
+        private static PortStatus ParseStatus(string status)
         {
-            PortStatus portStatus;
-
-            if (!Enum.TryParse(status.ToUpper(), out portStatus))
+            if (!Enum.TryParse(status.ToUpper(), out PortStatus portStatus))
                 throw new ArgumentException("Invalid status.");
 
             return portStatus;

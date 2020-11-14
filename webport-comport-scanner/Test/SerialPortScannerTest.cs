@@ -3,14 +3,15 @@ using System.IO.Ports;
 using Xunit;
 using System.Collections.Generic;
 using System.Linq;
-using webport_comport_scanner.Scanners;
-using webport_comport_scanner.Models;
+using webport_comport_scanner.Architecture;
+using webport_comport_scanner.Model;
+using webport_comport_scanner.Scanner;
 
 namespace webport_comport_scanner.Test
 {
     public class SerialPortScannerTest
     {
-        private bool _anyAvailablePort;
+        private readonly bool _anyAvailablePort;
 
         public SerialPortScannerTest()
         {
@@ -20,33 +21,32 @@ namespace webport_comport_scanner.Test
         [Fact]
         public void Test_MinPortLimit()
         {
-            IPortScanner serialPortScanner = new SerialPortScanner();
-            Assert.Throws<ArgumentOutOfRangeException>(() => serialPortScanner.Scan(-1, 100, PortStatus.ANY));
+            IPortScanner spScanner = new SerialPortScanner();
+            Assert.Throws<ArgumentOutOfRangeException>(() => spScanner.Scan(-1, 100, PortStatus.ANY));
         }
 
         [Fact]
         public void Test_MaxPortLimit()
         {
-            IPortScanner serialPortScanner = new SerialPortScanner();
-            Assert.Throws<ArgumentOutOfRangeException>(() => serialPortScanner.Scan(10, 65536, PortStatus.ANY));
+            IPortScanner spScanner = new SerialPortScanner();
+            Assert.Throws<ArgumentOutOfRangeException>(() => spScanner.Scan(10, 65536, PortStatus.ANY));
         }
 
         [Fact]
         public void Test_InvalidPortScanRange()
         {
-            IPortScanner serialPortScanner = new SerialPortScanner();
-            Assert.Throws<ArgumentException>(() => serialPortScanner.Scan(30, 15, PortStatus.ANY));
+            IPortScanner spScanner = new SerialPortScanner();
+            Assert.Throws<ArgumentException>(() => spScanner.Scan(30, 15, PortStatus.ANY));
         }
 
         [Fact]
         public void Test_ValidPortScanRange()
         {
-            IPortScanner serialPortScanner = new SerialPortScanner();
+            IPortScanner spScanner = new SerialPortScanner();
             
             try
             {
-                serialPortScanner.Scan(15, 30, PortStatus.ANY);
-                Assert.True(true);
+                spScanner.Scan(15, 30, PortStatus.ANY);
             }
             catch (Exception e)
             {
@@ -55,6 +55,8 @@ namespace webport_comport_scanner.Test
 
                 Assert.True(false, e.Message);
             }
+            
+            Assert.True(true);
         }
 
         [Theory]
@@ -63,12 +65,12 @@ namespace webport_comport_scanner.Test
         [InlineData(PortStatus.UNKNOWN)]
         public void Test_ValidPortStatus(PortStatus status)
         {
-            IPortScanner serialPortScanner = new SerialPortScanner();
-            IEnumerable<IPrintablePortStatus> scanResult = default;
+            IPortScanner spScanner = new SerialPortScanner();
+            IEnumerable<IPrintablePortStatus> sResult = default;
 
             try
             {
-                scanResult = serialPortScanner.Scan(0, 65535, status);
+                sResult = spScanner.Scan(0, 65535, status);
             }
             catch (Exception e)
             {
@@ -78,8 +80,8 @@ namespace webport_comport_scanner.Test
                 Assert.True(false, e.Message);
             }
             
-            string portStatusString = status.ToString();
-            Assert.True(scanResult.All(x => x.GetStatus() == portStatusString));
+            var portStatusString = status.ToString();
+            Assert.True(sResult.All(x => x.GetStatus() == portStatusString));
         }
 
         [Theory]
@@ -88,22 +90,22 @@ namespace webport_comport_scanner.Test
         [InlineData(150, 500)]
         public void Test_PortScanRangeEquals(int minPort, int maxPort)
         {
-            IPortScanner WebPortScanner = new SerialPortScanner();
-            IEnumerable<IPrintablePortStatus> scanResult = default;
+            IPortScanner spScanner = new SerialPortScanner();
+            IEnumerable<IPrintablePortStatus> sResult = default;
 
             try
             {
-                scanResult = WebPortScanner.Scan(minPort, maxPort, PortStatus.ANY);
+                sResult = spScanner.Scan(minPort, maxPort, PortStatus.ANY);
             }
             catch (Exception e)
             {
                if (!_anyAvailablePort)
                     return;
 
-                Assert.True(false, e.Message);
+               Assert.True(false, e.Message);
             }
             
-            Assert.Equal(maxPort - minPort, scanResult.Count());
+            Assert.Equal(maxPort - minPort, sResult.Count());
         }
     }
 }

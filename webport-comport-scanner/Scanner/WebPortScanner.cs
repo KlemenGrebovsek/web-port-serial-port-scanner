@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-using webport_comport_scanner.Models;
 using System.Linq;
+using webport_comport_scanner.Architecture;
+using webport_comport_scanner.Model;
 
-namespace webport_comport_scanner.Scanners
+namespace webport_comport_scanner.Scanner
 {
     /// <summary>
     /// Provides functionality of scanning web ports.
@@ -29,19 +30,16 @@ namespace webport_comport_scanner.Scanners
                 throw new ArgumentException("Max port cannot be less than min port.");
 
             if (minPort < 0 || maxPort > 65535)
-                throw new ArgumentOutOfRangeException("Min and max port values should be in range [0-65535].");
+                throw new ArgumentOutOfRangeException();
 
-            IPHostEntry iPHostEntry = Dns.GetHostEntry(Dns.GetHostName());
+            var iPHostEntry = Dns.GetHostEntry(Dns.GetHostName());
 
             if (iPHostEntry.AddressList.Length < 1)
                 throw new Exception("Web port scan couldn't be started.");
 
-            IEnumerable<WebPortStatus> scanResult = GetPortsStatus(iPHostEntry.AddressList[0], minPort, maxPort);
+            var sResult = GetPortsStatus(iPHostEntry.AddressList[0], minPort, maxPort);
 
-            if (status != PortStatus.ANY)
-                return scanResult.Where(x => x.GetStatusEnum() == status);
-                
-            return scanResult;
+            return status != PortStatus.ANY ? sResult.Where(x => x.GetStatusEnum() == status) : sResult;
         }
 
         /// <summary>
@@ -51,23 +49,21 @@ namespace webport_comport_scanner.Scanners
         /// <param name="minPort">Minimum port (including).</param>
         /// <param name="maxPort">Maximum port (including).</param>
         /// <exception cref="AggregateException">If any task within method was canceled.</exception>
-        /// <exception cref="ObjectDisposableException">If any task within method was disposed while being in use.</exception>
         /// <exception cref="Exception">If any task failed for unknown reason.</exception>
         /// <returns>A collection of web port status in range (min-max).</returns>
-        private IEnumerable<WebPortStatus> GetPortsStatus(IPAddress address, int minPort, int maxPort)
+        private static IEnumerable<WebPortStatus> GetPortsStatus(IPAddress address, int minPort, int maxPort)
         {
-            List<Task<WebPortStatus>> scanTasks = new List<Task<WebPortStatus>>(maxPort - minPort);
+            var scanTasks = new List<Task<WebPortStatus>>(maxPort - minPort);
 
             for (; minPort < maxPort; minPort++)
                 scanTasks.Add(Task.FromResult(GetPortStatus(address, minPort)));
 
-            Task<WebPortStatus[]> masterTask = Task.WhenAll(scanTasks);
+            var masterTask = Task.WhenAll(scanTasks);
 
             masterTask.Wait();
 
             if (masterTask.Status != TaskStatus.RanToCompletion)
-                throw new Exception("Ran into problem while trying to scan web port status:" +
-                                                $"{masterTask.Exception.InnerException.Message}");
+                throw new Exception("Ran into problem while trying to scan web port status.");
 
             return masterTask.Result;
         }
@@ -78,9 +74,9 @@ namespace webport_comport_scanner.Scanners
         /// <param name="address">Host ip address.</param>
         /// <param name="port">Port number.</param>
         /// <returns>Port status.</returns>
-        private WebPortStatus GetPortStatus(IPAddress address, int port)
+        private static WebPortStatus GetPortStatus(IPAddress address, int port)
         {
-            TcpListener tcpListener = default;
+            TcpListener tcpListener = null;
             WebPortStatus portStatus;
 
             try
@@ -100,8 +96,7 @@ namespace webport_comport_scanner.Scanners
             }
             finally
             {
-                if (tcpListener != default)
-                    tcpListener.Stop();
+                tcpListener?.Stop();
             }
 
             return portStatus;   

@@ -1,10 +1,11 @@
 ﻿using System;
 using System.IO.Ports;
-using webport_comport_scanner.Models;
 using System.Collections.Generic;
 using System.Linq;
+using webport_comport_scanner.Architecture;
+using webport_comport_scanner.Model;
 
-namespace webport_comport_scanner.Scanners
+namespace webport_comport_scanner.Scanner
 {
     /// <summary>
     /// Provides functionality of scanning serial ports.
@@ -30,31 +31,28 @@ namespace webport_comport_scanner.Scanners
             if (minPort < 0 || maxPort > 65535)
                 throw new ArgumentOutOfRangeException($"Min and max port ranges should be in range [0-65535].");
 
-            IEnumerable<string> serialPorts = SerialPort.GetPortNames()
-                                                        .Where(x => int.Parse(x.Substring(3)) >= minPort &&
-                                                         int.Parse(x.Substring(3)) <= maxPort);
+            var serialPorts = SerialPort.GetPortNames()
+                                                        .Where(x => int.Parse(x.Substring(3)) >= minPort && 
+                                                                    int.Parse(x.Substring(3)) <= maxPort).ToList();
 
-            if (serialPorts == default || !serialPorts.Any())
+            if (serialPorts == null || serialPorts.Count < 1)
                 throw new Exception("No serial ports found.");
 
-            IEnumerable<SerialPortStatus> scanResult = GetPortStatus(serialPorts);
+            var sResult = GetPortStatus(serialPorts);
 
-            if (status != PortStatus.ANY)
-                return scanResult.Where(x => x.GetStatusEnum() == status);
-                
-            return scanResult;
+            return status != PortStatus.ANY ? sResult.Where(x => x.GetStatusEnum() == status) : sResult;
         }
 
         /// <summary>
         /// Checks status of serial ports.
         /// </summary>
         /// <returns>A collection of serial port status.</returns>
-        private IEnumerable<SerialPortStatus> GetPortStatus(IEnumerable<string> serialPorts)
+        private static IEnumerable<SerialPortStatus> GetPortStatus(IEnumerable<string> serialPorts)
         {
-            SerialPort serialPort = default;
-            SerialPortStatus serialPortStatus = default;
+            SerialPort serialPort = null;
+            SerialPortStatus serialPortStatus = null;
 
-            foreach(string portName in serialPorts)
+            foreach(var portName in serialPorts)
             {
                 try
                 {
@@ -72,7 +70,7 @@ namespace webport_comport_scanner.Scanners
                 }
                 finally
                 {
-                    if (serialPort != default && serialPort.IsOpen)
+                    if (serialPort != null && serialPort.IsOpen)
                         serialPort.Close();
                 }
             }

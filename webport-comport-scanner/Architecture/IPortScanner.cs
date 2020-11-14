@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using webport_comport_scanner.Models;
+using webport_comport_scanner.Model;
 
-namespace webport_comport_scanner.Scanners
+namespace webport_comport_scanner.Architecture
 {
     public interface IPortScanner
     {

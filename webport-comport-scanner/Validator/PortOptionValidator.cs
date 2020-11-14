@@ -1,8 +1,8 @@
 using FluentValidation;
-using webport_comport_scanner.Models;
-using webport_comport_scanner.Options;
+using webport_comport_scanner.Model;
+using webport_comport_scanner.Option;
 
-namespace webport_comport_scanner.Validators
+namespace webport_comport_scanner.Validator
 {
     /// <summary>
     /// Provides validation for program options.
