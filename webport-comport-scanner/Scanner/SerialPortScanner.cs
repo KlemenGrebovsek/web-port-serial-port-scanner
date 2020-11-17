@@ -32,7 +32,7 @@ namespace webport_comport_scanner.Scanner
                 throw new ArgumentOutOfRangeException($"Min and max port ranges should be in range [0-65535].");
 
             var serialPorts = SerialPort.GetPortNames()
-                                                        .Where(x => int.Parse(x.Substring(3)) >= minPort && 
+                                                  .Where(x => int.Parse(x.Substring(3)) >= minPort && 
                                                                     int.Parse(x.Substring(3)) <= maxPort).ToList();
 
             if (serialPorts == null || serialPorts.Count < 1)

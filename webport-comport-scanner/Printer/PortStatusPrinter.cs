@@ -20,8 +20,7 @@ namespace webport_comport_scanner.Printer
 
         // Represents column width (number of chars).
         private const int ColWidth = 13;
-
-        // Buffered output stream.
+        
         private readonly BufferedStream _bufferedStream;
 
         public PortStatusPrinter()
@@ -52,7 +51,6 @@ namespace webport_comport_scanner.Printer
                 _bufferedStream.Write(Encoding.Unicode.GetBytes($"\n|{FillStringToLen(result.GetName(), ColWidth)}|" +
                                                                 $"{FillStringToLen(result.GetStatusString(), ColWidth)}|"));
             }
-            
             
             _bufferedStream.Write(tableLine);
             _bufferedStream.Flush();
