@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using MatthiWare.CommandLine;
 using webport_comport_scanner.Option;
 using MatthiWare.CommandLine.Extensions.FluentValidations;
@@ -36,7 +37,7 @@ namespace webport_comport_scanner.Parser
                 .Name("webPort")
                 .Required(false)
                 .Description("This command scans web ports.")
-                .OnExecuting((o) => 
+                .OnExecuting((o) =>
                 {
                     Console.WriteLine("Scanning web ports...");
 
@@ -53,7 +54,7 @@ namespace webport_comport_scanner.Parser
                 .OnExecuting((o) => 
                 {   
                     Console.WriteLine("Scanning serial ports...");
-
+                    
                     new PortStatusPrinter().PrintTable(new SerialPortScanner()
                                 .Scan(o.MinPort, o.MaxPort, ParseStatus(o.Status)));
                                 
@@ -99,7 +100,11 @@ namespace webport_comport_scanner.Parser
         /// <returns>Enum type of port status.</returns>
         private static PortStatus ParseStatus(string status)
         {
-            if (!Enum.TryParse(status.ToUpper(), out PortStatus portStatus))
+            // To avoid "problems" with upper and lower case thing, better for user.
+            var strEnum = status.First().ToString().ToUpper() 
+                          + status.Substring(1, status.Length - 1).ToLower();
+            
+            if (!Enum.TryParse(strEnum, out PortStatus portStatus))
                 throw new ArgumentException("Invalid status.");
 
             return portStatus;

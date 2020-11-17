@@ -15,21 +15,21 @@ namespace webport_comport_scanner.Test
         {
             IPortScanner wpScanner = new WebPortScanner();
             
-            Assert.Throws<ArgumentOutOfRangeException>(() => wpScanner.Scan(-1, 100, PortStatus.ANY));
+            Assert.Throws<ArgumentOutOfRangeException>(() => wpScanner.Scan(-1, 100, PortStatus.Any));
         }
 
         [Fact]
         public void Test_MaxPortLimit()
         {
             IPortScanner wpScanner = new WebPortScanner();
-            Assert.Throws<ArgumentOutOfRangeException>(() => wpScanner.Scan(10, 65536, PortStatus.ANY));
+            Assert.Throws<ArgumentOutOfRangeException>(() => wpScanner.Scan(10, 65536, PortStatus.Any));
         }
 
         [Fact]
         public void Test_InvalidPortScanRange()
         {
             IPortScanner wpScanner = new WebPortScanner();
-            Assert.Throws<ArgumentException>(() => wpScanner.Scan(30, 15, PortStatus.ANY));
+            Assert.Throws<ArgumentException>(() => wpScanner.Scan(30, 15, PortStatus.Any));
         }
 
         [Fact]
@@ -39,7 +39,7 @@ namespace webport_comport_scanner.Test
             
             try
             {
-                wpScanner.Scan(15, 30, PortStatus.ANY);
+                wpScanner.Scan(15, 30, PortStatus.Any);
             }
             catch (Exception e)
             {
@@ -50,9 +50,9 @@ namespace webport_comport_scanner.Test
         }
 
         [Theory]
-        [InlineData(PortStatus.FREE)]
-        [InlineData(PortStatus.IN_USE)]
-        [InlineData(PortStatus.UNKNOWN)]
+        [InlineData(PortStatus.Free)]
+        [InlineData(PortStatus.In_use)]
+        [InlineData(PortStatus.Unknown)]
         public void Test_ValidPortStatus(PortStatus status)
         {
             IPortScanner wpScanner = new WebPortScanner();
@@ -60,7 +60,7 @@ namespace webport_comport_scanner.Test
 
             try
             {
-                sResult = wpScanner.Scan(0, 65535, status);
+                sResult = wpScanner.Scan(0, 3000, status);
             }
             catch (Exception e)
             {
@@ -68,7 +68,7 @@ namespace webport_comport_scanner.Test
             }
             
             var portStatusString = status.ToString();
-            Assert.True(sResult.All(x => x.GetStatus() == portStatusString));
+            Assert.True(sResult.All(x => x.GetStatusString() == portStatusString));
         }
 
         [Theory]
@@ -82,14 +82,14 @@ namespace webport_comport_scanner.Test
 
             try
             {
-                sResult = wpScanner.Scan(minPort, maxPort, PortStatus.ANY);
+                sResult = wpScanner.Scan(minPort, maxPort, PortStatus.Any);
             }
             catch (Exception e)
             {
                 Assert.True(false, e.Message);
             }
             
-            Assert.Equal(maxPort - minPort, sResult.Count());
+            Assert.Equal((maxPort - minPort) + 1, sResult.Count());
         }
     }
 }

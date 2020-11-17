@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using webport_comport_scanner.Architecture;
 
@@ -17,10 +18,18 @@ namespace webport_comport_scanner.Printer
         // Represents second column header text.
         private const string StatusHeader = "STATUS";
 
-        // Represents min column width (number of chars).
-        private const int MinColWidth = 11;
+        // Represents column width (number of chars).
+        private const int ColWidth = 13;
 
+        // Buffered output stream.
+        private readonly BufferedStream _bufferedStream;
 
+        public PortStatusPrinter()
+        {
+            Console.OutputEncoding = Encoding.Unicode;
+            _bufferedStream = new BufferedStream(Console.OpenStandardOutput(), 8192);
+        }
+        
         /// <summary>
         /// Prints a collection of port status on console as table. 
         /// </summary>
@@ -29,54 +38,27 @@ namespace webport_comport_scanner.Printer
         {
             if (portStatuses == null)
                 return;
-
-            var statuses = portStatuses as IPrintablePortStatus[] ?? portStatuses.ToArray();
-            var tableOutput = new StringBuilder(); 
-
-            // Idea behind this variable is to get equal width of each column in table.
             
-            var columnWidth = GetColumnWidth(statuses.Max(x => x.GetMaxPrintLen()));
-
             // Define table line which will be printed after each row.
-            var tableLine = $"\n+{new string('-', (columnWidth * 2) + 1 )}+";
+            var tableLine = Encoding.Unicode.GetBytes($"\n+{new string('-', (ColWidth * 2) + 1 )}+");
 
-            tableOutput.Append($"\n {FillStringToLen(PortHeader, columnWidth)}" +
-                $" {FillStringToLen(StatusHeader, columnWidth)} ");
+            _bufferedStream.Write(Encoding.Unicode.GetBytes($"\n {FillStringToLen(PortHeader, ColWidth)}" +
+                                                            $" {FillStringToLen(StatusHeader, ColWidth)} "));
 
             // Generate rows of table
-            foreach (var result in statuses)
+            foreach (var result in portStatuses)
             {
-                tableOutput.Append(tableLine);
-                tableOutput.Append($"\n|{FillStringToLen(result.GetName(), columnWidth)}|" +
-                    $"{FillStringToLen(result.GetStatus(), columnWidth)}|");
+                _bufferedStream.Write(tableLine);
+                _bufferedStream.Write(Encoding.Unicode.GetBytes($"\n|{FillStringToLen(result.GetName(), ColWidth)}|" +
+                                                                $"{FillStringToLen(result.GetStatusString(), ColWidth)}|"));
             }
-
-            tableOutput.Append(tableLine);
-
-            Console.WriteLine(tableOutput.ToString());
-        }
-
-        /// <summary>
-        /// Calculates recommended column width for this data set.
-        /// </summary>
-        /// <param name="maxValWidth">Length of longest value in table.</param>
-        /// <returns>An integer, recommended column width.</returns>
-        private static int GetColumnWidth(int maxValWidth)
-        {
-            int recWidth;
-
-            // Get max width of table column headers.
-            var maxHeaderWidth = PortHeader.Length > StatusHeader.Length ? PortHeader.Length : StatusHeader.Length;
-
-            // Width of column shouldn't be less than min width.
-            if (maxValWidth < MinColWidth && maxHeaderWidth < MinColWidth)
-                recWidth = MinColWidth;
-            else
-                recWidth = (maxHeaderWidth > maxValWidth) ? maxHeaderWidth: maxValWidth;
             
-            return recWidth;
+            
+            _bufferedStream.Write(tableLine);
+            _bufferedStream.Flush();
+            _bufferedStream.Close();
         }
-
+        
         /// <summary>
         /// Fill string with empty chars to length.
         /// </summary>
@@ -86,7 +68,7 @@ namespace webport_comport_scanner.Printer
         private static string FillStringToLen(string value, int length)
         {
             return string.Format($"{{0,{length * -1}}}", string.Format("{0," +
-                ((length + value.Length) / 2).ToString() + "}", value));
+                ((length + value.Length) / 2) + "}", value));
         }
     }
 }

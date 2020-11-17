@@ -40,7 +40,7 @@ namespace webport_comport_scanner.Scanner
 
             var sResult = GetPortStatus(serialPorts);
 
-            return status != PortStatus.ANY ? sResult.Where(x => x.GetStatusEnum() == status) : sResult;
+            return status != PortStatus.Any ? sResult.Where(x => x.GetStatus() == status) : sResult;
         }
 
         /// <summary>
@@ -58,15 +58,15 @@ namespace webport_comport_scanner.Scanner
                 {
                     serialPort = new SerialPort(portName);
                     serialPort.Open();
-                    serialPortStatus = new SerialPortStatus(portName, PortStatus.FREE);
+                    serialPortStatus = new SerialPortStatus(portName, PortStatus.Free);
                 }
                 catch (UnauthorizedAccessException)
                 {
-                    serialPortStatus = new SerialPortStatus(portName, PortStatus.IN_USE);
+                    serialPortStatus = new SerialPortStatus(portName, PortStatus.In_use);
                 }
                 catch (Exception)
                 {
-                    serialPortStatus = new SerialPortStatus(portName, PortStatus.UNKNOWN);
+                    serialPortStatus = new SerialPortStatus(portName, PortStatus.Unknown);
                 }
                 finally
                 {

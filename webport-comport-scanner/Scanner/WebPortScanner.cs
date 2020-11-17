@@ -39,7 +39,7 @@ namespace webport_comport_scanner.Scanner
 
             var sResult = GetPortsStatus(iPHostEntry.AddressList[0], minPort, maxPort);
 
-            return status != PortStatus.ANY ? sResult.Where(x => x.GetStatusEnum() == status) : sResult;
+            return status != PortStatus.Any ? sResult.Where(x => x.GetStatus() == status) : sResult;
         }
 
         /// <summary>
@@ -55,7 +55,7 @@ namespace webport_comport_scanner.Scanner
         {
             var scanTasks = new List<Task<WebPortStatus>>(maxPort - minPort);
 
-            for (; minPort < maxPort; minPort++)
+            for (; minPort < maxPort + 1; minPort++)
                 scanTasks.Add(Task.FromResult(GetPortStatus(address, minPort)));
 
             var masterTask = Task.WhenAll(scanTasks);
@@ -84,15 +84,15 @@ namespace webport_comport_scanner.Scanner
                 tcpListener = new TcpListener(address, port);
                 tcpListener.Start();
 
-                portStatus = new WebPortStatus(port, PortStatus.FREE);
+                portStatus = new WebPortStatus(port, PortStatus.Free);
             }
             catch (SocketException)
             {
-                portStatus = new WebPortStatus(port, PortStatus.IN_USE);
+                portStatus = new WebPortStatus(port, PortStatus.In_use);
             }
             catch (Exception)
             {
-                portStatus = new WebPortStatus(port, PortStatus.UNKNOWN);
+                portStatus = new WebPortStatus(port, PortStatus.Unknown);
             }
             finally
             {

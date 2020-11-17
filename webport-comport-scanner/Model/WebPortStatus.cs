@@ -21,23 +21,14 @@ namespace webport_comport_scanner.Model
             return _port.ToString();
         }
 
-        public string GetStatus()
+        public string GetStatusString()
         {
             return _status.ToString();
         }
 
-        public PortStatus GetStatusEnum()
+        public PortStatus GetStatus()
         {
             return _status;
         }
-
-        public int GetMaxPrintLen()
-        {
-            var nameLen = _port.ToString().Length;
-            var statusLen = _status.ToString().Length;
-
-            return (nameLen > statusLen) ? nameLen : statusLen;
-        }
-
     }  
 }
