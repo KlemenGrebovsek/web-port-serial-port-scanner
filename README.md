@@ -27,12 +27,12 @@ Description: Program scans ports that are equal or less than this value (0 - 655
 
 [-s --status] 
 
-Description: Program searches for ports that have this status. (any, free, in_use), default value is "in_use";
+Description: Program searches for ports that have this status. (Any, Free, In_use), default value is "Any";
 
 
 **Sample args**
 
-1) webPort -f 100 -t 3000 -s in_use
+1) webPort -f 100 -t 3000 -s In_use
 2) serialPort -t 6
-3) webPort -s free
-2) serialPort -s any
+3) webPort -s Free
+2) serialPort -s Any
