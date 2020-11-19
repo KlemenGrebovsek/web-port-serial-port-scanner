@@ -53,7 +53,7 @@ namespace webport_comport_scanner.Scanner
         /// <returns>A collection of web port status in range (min-max).</returns>
         private static IEnumerable<WebPortStatus> GetPortsStatus(IPAddress address, int minPort, int maxPort)
         {
-            var scanTasks = new List<Task<WebPortStatus>>(maxPort - minPort);
+            var scanTasks = new List<Task<WebPortStatus>>((maxPort - minPort) + 1);
 
             for (; minPort < maxPort + 1; minPort++)
                 scanTasks.Add(Task.FromResult(GetPortStatus(address, minPort)));
