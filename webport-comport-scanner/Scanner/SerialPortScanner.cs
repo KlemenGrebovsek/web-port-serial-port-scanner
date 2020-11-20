@@ -16,7 +16,7 @@ namespace webport_comport_scanner.Scanner
         /// Scans for serial ports and their status.
         /// </summary>
         /// <exception cref="ArgumentException">If min and max port are logically wrong.</exception>
-        /// <exception cref="ArgumentOutOfRangeException">If min and max are outside the port range. </exception>
+        /// <exception cref="ArgumentOutOfRangeException">If min or max value is outside the port range. </exception>
         /// <exception cref="Exception">If scan of ports can't be started or any other reason.</exception>
         /// <param name="minPort">Minimum port (including).</param>
         /// <param name="maxPort">Maximum port (including).</param>

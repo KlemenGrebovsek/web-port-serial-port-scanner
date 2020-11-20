@@ -18,7 +18,7 @@ namespace webport_comport_scanner.Option
         public int MaxPort { get; set; }
 
         [Name("s", "status")]
-        [Description("Searches for ports that have that status. (Any, Free, In_use).")]
+        [Description("Searches for ports that have this status. (Any, Free, In_use).")]
         [DefaultValue("Any")]
         public string Status { get; set; }
 

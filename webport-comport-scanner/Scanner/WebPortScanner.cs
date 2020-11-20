@@ -18,7 +18,7 @@ namespace webport_comport_scanner.Scanner
         /// Scans for web ports and their status.
         /// </summary>
         /// <exception cref="ArgumentException">If min and max port are logically wrong.</exception>
-        /// <exception cref="ArgumentOutOfRangeException">If min and max are outside the port range. </exception>
+        /// <exception cref="ArgumentOutOfRangeException">If min or max value is outside the port range. </exception>
         /// <exception cref="Exception">If scan of ports can't be started or any other reason.</exception>
         /// <param name="minPort">Minimum port (including).</param>
         /// <param name="maxPort">Maximum port (including).</param>
@@ -43,13 +43,13 @@ namespace webport_comport_scanner.Scanner
         }
 
         /// <summary>
-        /// Checks status of all ports async.
+        /// Checks status of ports in specific range.
         /// </summary>
         /// <param name="address">IP address.</param>
         /// <param name="minPort">Minimum port (including).</param>
         /// <param name="maxPort">Maximum port (including).</param>
-        /// <exception cref="AggregateException">If any task within method was canceled.</exception>
-        /// <exception cref="Exception">If any task failed for unknown reason.</exception>
+        /// <exception cref="AggregateException">If any task within method failed.</exception>
+        /// <exception cref="Exception">If any task failed for 'unknown' reason.</exception>
         /// <returns>A collection of web port status in range (min-max).</returns>
         private static IEnumerable<WebPortStatus> GetPortsStatus(IPAddress address, int minPort, int maxPort)
         {
@@ -69,7 +69,7 @@ namespace webport_comport_scanner.Scanner
         }
 
         /// <summary>
-        /// Checks status of given port.
+        /// Checks status of specific port.
         /// </summary>
         /// <param name="address">Host ip address.</param>
         /// <param name="port">Port number.</param>

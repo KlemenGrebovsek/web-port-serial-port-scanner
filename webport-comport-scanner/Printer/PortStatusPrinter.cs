@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -30,7 +29,7 @@ namespace webport_comport_scanner.Printer
         }
         
         /// <summary>
-        /// Prints a collection of port status on console as table. 
+        /// Prints a collection of port status in console as table. 
         /// </summary>
         /// <param name="portStatuses">A collection of type port status.</param>
         public void PrintTable(IEnumerable<IPrintablePortStatus> portStatuses)

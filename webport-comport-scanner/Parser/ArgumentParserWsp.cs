@@ -69,7 +69,7 @@ namespace webport_comport_scanner.Parser
         }
 
         /// <summary>
-        /// Parses given arguments and starts exectuting commands.
+        /// Parses given arguments and starts executing commands.
         /// </summary>
         /// <param name="args">Program arguments.</param>
         public void Parse(string[] args)
