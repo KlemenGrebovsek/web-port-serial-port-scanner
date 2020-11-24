@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using MatthiWare.CommandLine;
 using webport_comport_scanner.Option;
 using MatthiWare.CommandLine.Extensions.FluentValidations;

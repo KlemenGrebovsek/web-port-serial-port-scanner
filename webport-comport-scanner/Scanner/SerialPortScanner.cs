@@ -26,10 +26,12 @@ namespace webport_comport_scanner.Scanner
         {
             if (maxPort < minPort)
                 throw new ArgumentException("Max port cannot be less than min port.");
-
-            // Physically there probably won't be more than 265 serial ports at max, but anyway.
-            if (minPort < 0 || maxPort > 65535)
-                throw new ArgumentOutOfRangeException($"Min and max port ranges should be in range [0-65535].");
+            
+            if (minPort < 0)
+                throw new ArgumentOutOfRangeException(nameof(minPort));
+            
+            if (maxPort > 65535)
+                throw new ArgumentOutOfRangeException(nameof(maxPort));
 
             var serialPorts = SerialPort.GetPortNames()
                                                   .Where(x => int.Parse(x.Substring(3)) >= minPort && 

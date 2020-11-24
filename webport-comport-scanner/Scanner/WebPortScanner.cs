@@ -29,8 +29,11 @@ namespace webport_comport_scanner.Scanner
             if (maxPort < minPort)
                 throw new ArgumentException("Max port cannot be less than min port.");
 
-            if (minPort < 0 || maxPort > 65535)
-                throw new ArgumentOutOfRangeException();
+            if (minPort < 0)
+                throw new ArgumentOutOfRangeException(nameof(minPort));
+            
+            if (maxPort > 65535)
+                throw new ArgumentOutOfRangeException(nameof(maxPort));
 
             var iPHostEntry = Dns.GetHostEntry(Dns.GetHostName());
 
@@ -48,8 +51,7 @@ namespace webport_comport_scanner.Scanner
         /// <param name="address">IP address.</param>
         /// <param name="minPort">Minimum port (including).</param>
         /// <param name="maxPort">Maximum port (including).</param>
-        /// <exception cref="AggregateException">If any task within method failed.</exception>
-        /// <exception cref="Exception">If any task failed for 'unknown' reason.</exception>
+        /// <exception cref="Exception">If any task failed for any reason.</exception>
         /// <returns>A collection of web port status in range (min-max).</returns>
         private static IEnumerable<WebPortStatus> GetPortsStatus(IPAddress address, int minPort, int maxPort)
         {
@@ -61,10 +63,7 @@ namespace webport_comport_scanner.Scanner
             var masterTask = Task.WhenAll(scanTasks);
 
             masterTask.Wait();
-
-            if (masterTask.Status != TaskStatus.RanToCompletion)
-                throw new Exception("Ran into problem while trying to scan web port status.");
-
+            
             return masterTask.Result;
         }
 

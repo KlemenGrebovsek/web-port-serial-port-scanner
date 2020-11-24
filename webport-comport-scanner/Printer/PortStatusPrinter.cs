@@ -7,7 +7,7 @@ using webport_comport_scanner.Architecture;
 namespace webport_comport_scanner.Printer
 {
     /// <summary>
-    /// Provides functionality to print port scan results to console.
+    /// Provides functionality to print port scan result to console.
     /// </summary>
     public class PortStatusPrinter : IPortStatusPrinter
     {
