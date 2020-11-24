@@ -40,31 +40,13 @@ namespace webport_comport_scanner.Scanner
             if (iPHostEntry.AddressList.Length < 1)
                 throw new Exception("Web port scan couldn't be started.");
 
-            var sResult = GetPortsStatus(iPHostEntry.AddressList[0], minPort, maxPort);
+            var host = iPHostEntry.AddressList[0];
 
-            return status != PortStatus.Any ? sResult.Where(x => x.GetStatus() == status) : sResult;
-        }
-
-        /// <summary>
-        /// Checks status of ports in specific range.
-        /// </summary>
-        /// <param name="address">IP address.</param>
-        /// <param name="minPort">Minimum port (including).</param>
-        /// <param name="maxPort">Maximum port (including).</param>
-        /// <exception cref="Exception">If any task failed for any reason.</exception>
-        /// <returns>A collection of web port status in range (min-max).</returns>
-        private static IEnumerable<WebPortStatus> GetPortsStatus(IPAddress address, int minPort, int maxPort)
-        {
-            var scanTasks = new List<Task<WebPortStatus>>((maxPort - minPort) + 1);
-
-            for (; minPort < maxPort + 1; minPort++)
-                scanTasks.Add(Task.FromResult(GetPortStatus(address, minPort)));
-
-            var masterTask = Task.WhenAll(scanTasks);
-
-            masterTask.Wait();
+            var sResult = Task.WhenAll(
+                Enumerable.Range(minPort, (maxPort - minPort) + 1)
+                                .Select(x => Task.FromResult(GetPortStatus(host, x)))).Result;
             
-            return masterTask.Result;
+            return status != PortStatus.Any ? sResult.Where(x => x.GetStatus() == status) : sResult;
         }
 
         /// <summary>

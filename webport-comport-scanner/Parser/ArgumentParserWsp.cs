@@ -39,10 +39,10 @@ namespace webport_comport_scanner.Parser
                 .OnExecuting((o) =>
                 {
                     Console.WriteLine("Scanning web ports...");
-
+                    
                     new PortStatusPrinter().PrintTable(new WebPortScanner()
                                 .Scan(o.MinPort, o.MaxPort, ParseStatus(o.Status)));
-
+                    
                     Console.WriteLine("\nDone!");
                 });
 
