@@ -1,5 +1,5 @@
 # web and serial port scanner
-Simple console program for scanning web port and serial port status.
+Console program for scanning web port and serial port status.
 
 **Commands:**
 
@@ -15,7 +15,7 @@ Description: Scans serial ports and their status.
 
 Description: Displays program options.
 
-**Command options**
+**Options**
 
 [-f --from]  
 
