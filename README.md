@@ -27,7 +27,7 @@ Description: Program scans ports that are equal or less than this value (0 - 655
 
 [-s --status] 
 
-Description: Program searches for ports that have this status. (Any, Free, In_use), default value is "Any";
+Description: Program searches for ports that have this status. (Any, Free, InUse, Unknown), default value is "Any";
 
 
 **Sample args**
