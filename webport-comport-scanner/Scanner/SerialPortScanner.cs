@@ -2,7 +2,8 @@
 using System.IO.Ports;
 using System.Collections.Generic;
 using System.Linq;
-using webport_comport_scanner.Architecture;
+using System.Threading;
+using System.Threading.Tasks;
 using webport_comport_scanner.Model;
 
 namespace webport_comport_scanner.Scanner
@@ -18,14 +19,16 @@ namespace webport_comport_scanner.Scanner
         /// <exception cref="ArgumentException">If min and max port are logically wrong.</exception>
         /// <exception cref="ArgumentOutOfRangeException">If min or max value is outside the port range. </exception>
         /// <exception cref="Exception">If scan of ports can't be started or any other reason.</exception>
-        /// <param name="minPort">Minimum port (including).</param>
-        /// <param name="maxPort">Maximum port (including).</param>
-        /// <param name="status">Filter ports by this status.</param>
+        /// <param name="sSettings">Object containing all scan settings.</param>
+        /// <param name="cToken">CancellationToken object.</param>
         /// <returns>A collection of type serial port status in range of [min-max].</returns>
-        public IEnumerable<IPrintablePortStatus> Scan(int minPort, int maxPort, PortStatus status)
+        public async Task<IEnumerable<IPrintablePortStatus>> ScanAsync(IScanProperties sSettings, CancellationToken cToken)
         {
+            var minPort = sSettings.GetMinPort();
+            var maxPort = sSettings.GetMaxPort();
+            
             if (maxPort < minPort)
-                throw new ArgumentException("Max port cannot be less than min port.");
+                throw new ArgumentException("Max port value is less than min port value.");
             
             if (minPort < 0)
                 throw new ArgumentOutOfRangeException(nameof(minPort));
@@ -37,12 +40,16 @@ namespace webport_comport_scanner.Scanner
                                                   .Where(x => int.Parse(x.Substring(3)) >= minPort && 
                                                                     int.Parse(x.Substring(3)) <= maxPort).ToList();
 
-            if (serialPorts == null || serialPorts.Count < 1)
-                throw new Exception("No serial ports found.");
+            if (serialPorts.Count < 1)
+                throw new Exception("No serial port found.");
 
-            var sResult = GetPortStatus(serialPorts);
+            var sResult = await Task.Run(() => GetPortStatus(serialPorts), cToken);
 
-            return status != PortStatus.Any ? sResult.Where(x => x.GetStatus() == status) : sResult;
+            var status = sSettings.GetSearchStatus();
+            var targetStatus = status.ToString();
+
+            return status != PortStatus.Any ? sResult.Where(x => x.GetStatusString() == targetStatus 
+                                                                 || x.GetStatusString() == "Unknown") : sResult;
         }
 
         /// <summary>
@@ -56,6 +63,7 @@ namespace webport_comport_scanner.Scanner
 
             foreach(var portName in serialPorts)
             {
+                
                 try
                 {
                     serialPort = new SerialPort(portName);

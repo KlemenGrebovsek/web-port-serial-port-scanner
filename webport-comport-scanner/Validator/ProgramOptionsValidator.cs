@@ -7,9 +7,9 @@ namespace webport_comport_scanner.Validator
     /// <summary>
     /// Provides validation for program options.
     /// </summary>
-    public class PortOptionValidator: AbstractValidator<ProgramOptions>
+    public class ProgramOptionsValidator: AbstractValidator<ProgramOptions>
     {
-        public PortOptionValidator()
+        public ProgramOptionsValidator()
         {
             RuleFor(o => o.MinPort).InclusiveBetween(0, 65535);
             RuleFor(o => o.MaxPort).InclusiveBetween(0, 65535);

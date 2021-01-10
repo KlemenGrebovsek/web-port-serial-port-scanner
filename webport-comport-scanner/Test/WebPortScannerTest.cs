@@ -2,7 +2,7 @@ using System;
 using Xunit;
 using System.Collections.Generic;
 using System.Linq;
-using webport_comport_scanner.Architecture;
+using System.Threading;
 using webport_comport_scanner.Model;
 using webport_comport_scanner.Scanner;
 
@@ -13,37 +13,97 @@ namespace webport_comport_scanner.Test
         [Fact]
         public void Test_MinPortLimit()
         {
-            IPortScanner wpScanner = new WebPortScanner();
+            var webScanner = new WebPortScanner();
+            var cancellationTokenSource = new CancellationTokenSource();
+            var cToken = cancellationTokenSource.Token; 
             
-            Assert.Throws<ArgumentOutOfRangeException>(() => wpScanner.Scan(-1, 100, PortStatus.Any));
+            try
+            {
+                Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () =>
+                {
+                    var scanProperties = new ScanProperties(-1, 100, PortStatus.Any);
+                    await webScanner.ScanAsync(scanProperties, cToken);
+                });
+            }
+            catch (Exception e)
+            {
+                Assert.True(false, e.Message);
+            }
+            finally
+            {
+                cancellationTokenSource.Dispose(); 
+            }
         }
 
         [Fact]
         public void Test_MaxPortLimit()
         {
-            IPortScanner wpScanner = new WebPortScanner();
-            Assert.Throws<ArgumentOutOfRangeException>(() => wpScanner.Scan(10, 65536, PortStatus.Any));
+            var wpScanner = new WebPortScanner();
+            var cancellationTokenSource = new CancellationTokenSource();
+            var cToken = cancellationTokenSource.Token; 
+            
+            try
+            {
+                Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () =>
+                {
+                    var scanProperties = new ScanProperties(10, 65536, PortStatus.Any);
+                    await wpScanner.ScanAsync(scanProperties, cToken);
+                });
+            }
+            catch (Exception e)
+            {
+                Assert.True(false, e.Message);
+            }
+            finally
+            {
+                cancellationTokenSource.Dispose(); 
+            }
         }
 
         [Fact]
         public void Test_InvalidPortScanRange()
         {
-            IPortScanner wpScanner = new WebPortScanner();
-            Assert.Throws<ArgumentException>(() => wpScanner.Scan(30, 15, PortStatus.Any));
+            var wpScanner = new WebPortScanner();
+            var cancellationTokenSource = new CancellationTokenSource();
+            var cToken = cancellationTokenSource.Token; 
+            
+            try
+            {
+                Assert.ThrowsAsync<ArgumentException>(async () =>
+                {
+                    var scanProperties = new ScanProperties(30, 15, PortStatus.Any);
+                    await wpScanner.ScanAsync(scanProperties, cToken);
+                });
+            }
+            catch (Exception e)
+            {
+                Assert.True(false, e.Message);
+            }
+            finally
+            {
+                cancellationTokenSource.Dispose(); 
+            }
         }
 
         [Fact]
         public void Test_ValidPortScanRange()
         {
-            IPortScanner wpScanner = new WebPortScanner();
+            var wpScanner = new WebPortScanner();
+            var cancellationTokenSource = new CancellationTokenSource();
+            var cToken = cancellationTokenSource.Token; 
             
             try
             {
-                wpScanner.Scan(15, 30, PortStatus.Any);
+                var task = wpScanner.ScanAsync(new ScanProperties(15, 30, PortStatus.Any), cToken);
+                var result = task.Result;
             }
             catch (Exception e)
             {
-               Assert.True(false, e.Message);
+                Assert.True(false, e.Message);
+            }
+            finally
+            {
+                cancellationTokenSource.Dispose(); 
             }
             
             Assert.True(true);
@@ -52,23 +112,44 @@ namespace webport_comport_scanner.Test
         [Theory]
         [InlineData(PortStatus.Free)]
         [InlineData(PortStatus.In_use)]
-        [InlineData(PortStatus.Unknown)]
+        [InlineData(PortStatus.Any)]
         public void Test_ValidPortStatus(PortStatus status)
         {
-            IPortScanner wpScanner = new WebPortScanner();
-            IEnumerable<IPrintablePortStatus> sResult = default;
-
+            const int minPort = 0;
+            const int maxPort = 3000;
+            
+            var wpScanner = new WebPortScanner();
+            var cancellationTokenSource = new CancellationTokenSource();
+            var cToken = cancellationTokenSource.Token;
+            
+            IList<IPrintablePortStatus> sResult = default;
+            
             try
             {
-                sResult = wpScanner.Scan(0, 3000, status);
+                var task = wpScanner.ScanAsync(new ScanProperties(minPort, maxPort, status), cToken);
+                sResult = task.Result.ToList();
             }
             catch (Exception e)
             {
                 Assert.True(false, e.Message);
             }
+            finally
+            {
+                cancellationTokenSource.Dispose(); 
+            }
+
+            bool statusOk;
+
+            if (status == PortStatus.Any)
+                statusOk = ((maxPort - minPort) + 1) == sResult.Count;
+            else
+            {
+                var portStatusString = status.ToString();
+                statusOk = sResult.All(x => x.GetStatusString() == portStatusString ||
+                                            x.GetStatusString() == "Unknown");
+            }
             
-            var portStatusString = status.ToString();
-            Assert.True(sResult.All(x => x.GetStatusString() == portStatusString));
+            Assert.True(statusOk);
         }
 
         [Theory]
@@ -77,19 +158,23 @@ namespace webport_comport_scanner.Test
         [InlineData(150, 500)]
         public void Test_PortScanRangeEquals(int minPort, int maxPort)
         {
-            IPortScanner wpScanner = new WebPortScanner();
-            IEnumerable<IPrintablePortStatus> sResult = default;
+            var wpScanner = new WebPortScanner();
+            var cancellationTokenSource = new CancellationTokenSource();
+            var cToken = cancellationTokenSource.Token;
+            
+            IList<IPrintablePortStatus> sResult = default;
 
             try
             {
-                sResult = wpScanner.Scan(minPort, maxPort, PortStatus.Any);
+                var task = wpScanner.ScanAsync(new ScanProperties(minPort, maxPort, PortStatus.Any), cToken);
+                sResult = task.Result.ToList();
             }
             catch (Exception e)
             {
                 Assert.True(false, e.Message);
             }
             
-            Assert.Equal((maxPort - minPort) + 1, sResult.Count());
+            Assert.Equal((maxPort - minPort) + 1, sResult.Count);
         }
     }
 }

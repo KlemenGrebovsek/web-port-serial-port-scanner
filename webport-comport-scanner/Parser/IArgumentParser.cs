@@ -1,11 +1,11 @@
-namespace webport_comport_scanner.Architecture
+namespace webport_comport_scanner.Parser
 {
     public interface IArgumentParser
     {
         /// <summary>
-        /// Parses given arguments and starts executing commands.
+        /// Parse given arguments and execute command.
         /// </summary>
         /// <param name="args">Program arguments.</param>
-        void Parse(string[] args);
+        void ParseAsync(string[] args);
     }
 }

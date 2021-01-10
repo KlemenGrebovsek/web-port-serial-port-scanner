@@ -1,15 +1,15 @@
-﻿namespace webport_comport_scanner.Architecture
+﻿namespace webport_comport_scanner.Model
 {
     public interface IPrintablePortStatus
     {
         /// <summary>
-        /// Gets port name as string.
+        /// Get port name as string.
         /// </summary>
         /// <returns>A string representing port name.</returns>
         public string GetName();
 
         /// <summary>
-        /// Gets port status as string.
+        /// Get port status as string.
         /// </summary>
         /// <returns>A string representing port status.</returns>
         public string GetStatusString();

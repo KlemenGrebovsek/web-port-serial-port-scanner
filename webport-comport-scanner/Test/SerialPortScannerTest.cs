@@ -3,7 +3,7 @@ using System.IO.Ports;
 using Xunit;
 using System.Collections.Generic;
 using System.Linq;
-using webport_comport_scanner.Architecture;
+using System.Threading;
 using webport_comport_scanner.Model;
 using webport_comport_scanner.Scanner;
 
@@ -11,49 +11,100 @@ namespace webport_comport_scanner.Test
 {
     public class SerialPortScannerTest
     {
-        private readonly bool _anyAvailablePort;
-
-        public SerialPortScannerTest()
-        {
-            _anyAvailablePort = SerialPort.GetPortNames().Any();
-        }
-
         [Fact]
         public void Test_MinPortLimit()
         {
-            IPortScanner spScanner = new SerialPortScanner();
-            Assert.Throws<ArgumentOutOfRangeException>(() => spScanner.Scan(-1, 100, PortStatus.Any));
+            var spScanner = new SerialPortScanner();
+            var cancellationTokenSource = new CancellationTokenSource();
+            var cToken = cancellationTokenSource.Token; 
+            
+            try
+            {
+                Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () =>
+                {
+                    var scanProperties = new ScanProperties(-1, 3, PortStatus.Any);
+                    await spScanner.ScanAsync(scanProperties, cToken);
+                });
+            }
+            catch (Exception e)
+            {
+                Assert.True(false, e.Message);
+            }
+            finally
+            {
+                cancellationTokenSource.Dispose(); 
+            }
         }
 
         [Fact]
         public void Test_MaxPortLimit()
         {
-            IPortScanner spScanner = new SerialPortScanner();
-            Assert.Throws<ArgumentOutOfRangeException>(() => spScanner.Scan(10, 65536, PortStatus.Any));
+            var spScanner = new SerialPortScanner();
+            var cancellationTokenSource = new CancellationTokenSource();
+            var cToken = cancellationTokenSource.Token; 
+            
+            try
+            {
+                Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () =>
+                {
+                    var scanProperties = new ScanProperties(1, 65536, PortStatus.Any);
+                    await spScanner.ScanAsync(scanProperties, cToken);
+                });
+            }
+            catch (Exception e)
+            {
+                Assert.True(false, e.Message);
+            }
+            finally
+            {
+                cancellationTokenSource.Dispose(); 
+            }
         }
 
         [Fact]
         public void Test_InvalidPortScanRange()
         {
-            IPortScanner spScanner = new SerialPortScanner();
-            Assert.Throws<ArgumentException>(() => spScanner.Scan(30, 15, PortStatus.Any));
+            var spScanner = new SerialPortScanner();
+            var cancellationTokenSource = new CancellationTokenSource();
+            var cToken = cancellationTokenSource.Token; 
+            
+            try
+            {
+                Assert.ThrowsAsync<ArgumentException>(async () =>
+                {
+                    var scanProperties = new ScanProperties(3, 1, PortStatus.Any);
+                    await spScanner.ScanAsync(scanProperties, cToken);
+                });
+            }
+            catch (Exception e)
+            {
+                Assert.True(false, e.Message);
+            }
+            finally
+            {
+                cancellationTokenSource.Dispose(); 
+            }
         }
 
         [Fact]
         public void Test_ValidPortScanRange()
         {
-            IPortScanner spScanner = new SerialPortScanner();
+            var spScanner = new SerialPortScanner();
+            var cancellationTokenSource = new CancellationTokenSource();
+            var cToken = cancellationTokenSource.Token; 
             
             try
             {
-                spScanner.Scan(15, 30, PortStatus.Any);
+                var task = spScanner.ScanAsync(new ScanProperties(1, 3, PortStatus.Any), cToken);
+                var result = task.Result;
             }
             catch (Exception e)
             {
-                if (!_anyAvailablePort)
-                    return;
-
                 Assert.True(false, e.Message);
+            }
+            finally
+            {
+                cancellationTokenSource.Dispose(); 
             }
             
             Assert.True(true);
@@ -62,26 +113,44 @@ namespace webport_comport_scanner.Test
         [Theory]
         [InlineData(PortStatus.Free)]
         [InlineData(PortStatus.In_use)]
-        [InlineData(PortStatus.Unknown)]
+        [InlineData(PortStatus.Any)]
         public void Test_ValidPortStatus(PortStatus status)
         {
-            IPortScanner spScanner = new SerialPortScanner();
-            IEnumerable<IPrintablePortStatus> sResult = default;
-
+            const int minPort = 1;
+            const int maxPort = 2;
+            
+            var spScanner = new SerialPortScanner();
+            var cancellationTokenSource = new CancellationTokenSource();
+            var cToken = cancellationTokenSource.Token;
+            
+            IList<IPrintablePortStatus> sResult = default;
+            
             try
             {
-                sResult = spScanner.Scan(0, 3000, status);
+                var task = spScanner.ScanAsync(new ScanProperties(minPort, maxPort, status), cToken);
+                sResult = task.Result.ToList();
             }
             catch (Exception e)
             {
-                if (!_anyAvailablePort)
-                    return;
-
                 Assert.True(false, e.Message);
             }
+            finally
+            {
+                cancellationTokenSource.Dispose(); 
+            }
+
+            bool statusOk;
+
+            if (status == PortStatus.Any)
+                statusOk = ((maxPort - minPort) + 1) == sResult.Count;
+            else
+            {
+                var portStatusString = status.ToString();
+                statusOk = sResult.All(x => x.GetStatusString() == portStatusString ||
+                                            x.GetStatusString() == "Unknown");
+            }
             
-            var portStatusString = status.ToString();
-            Assert.True(sResult.All(x => x.GetStatusString() == portStatusString));
+            Assert.True(statusOk);
         }
 
         [Theory]
@@ -90,22 +159,23 @@ namespace webport_comport_scanner.Test
         [InlineData(1, 3)]
         public void Test_PortScanRangeEquals(int minPort, int maxPort)
         {
-            IPortScanner spScanner = new SerialPortScanner();
-            IEnumerable<IPrintablePortStatus> sResult = default;
+            var spScanner = new SerialPortScanner();
+            var cancellationTokenSource = new CancellationTokenSource();
+            var cToken = cancellationTokenSource.Token;
+            
+            IList<IPrintablePortStatus> sResult = default;
 
             try
             {
-                sResult = spScanner.Scan(minPort, maxPort, PortStatus.Any);
+                var task = spScanner.ScanAsync(new ScanProperties(minPort, maxPort, PortStatus.Any), cToken);
+                sResult = task.Result.ToList();
             }
             catch (Exception e)
             {
-               if (!_anyAvailablePort)
-                    return;
-
-               Assert.True(false, e.Message);
+                Assert.True(false, e.Message);
             }
             
-            Assert.Equal((maxPort - minPort) + 1, sResult.Count());
+            Assert.Equal((maxPort - minPort) + 1, sResult.Count);
         }
     }
 }

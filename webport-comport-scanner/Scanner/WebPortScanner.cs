@@ -4,7 +4,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using System.Linq;
-using webport_comport_scanner.Architecture;
+using System.Threading;
 using webport_comport_scanner.Model;
 
 namespace webport_comport_scanner.Scanner
@@ -15,38 +15,51 @@ namespace webport_comport_scanner.Scanner
     public class WebPortScanner : IPortScanner
     {
         /// <summary>
-        /// Scans for web ports and their status.
+        /// Scan for web ports and their status async.
         /// </summary>
         /// <exception cref="ArgumentException">If min and max port are logically wrong.</exception>
         /// <exception cref="ArgumentOutOfRangeException">If min or max value is outside the port range. </exception>
         /// <exception cref="Exception">If scan of ports can't be started or any other reason.</exception>
-        /// <param name="minPort">Minimum port (including).</param>
-        /// <param name="maxPort">Maximum port (including).</param>
-        /// <param name="status">Filter ports by this status.</param>
+        /// <param name="sSettings">Object containing all scan settings.</param>
+        /// <param name="cToken">CancellationToken object.</param>
         /// <returns>A collection of type web port status in range of [min-max].</returns>
-        public IEnumerable<IPrintablePortStatus> Scan(int minPort, int maxPort, PortStatus status)
+        public async Task<IEnumerable<IPrintablePortStatus>> ScanAsync(IScanProperties sSettings, CancellationToken cToken)
         {
+            var minPort = sSettings.GetMinPort();
+            var maxPort = sSettings.GetMaxPort();
+            
             if (maxPort < minPort)
-                throw new ArgumentException("Max port cannot be less than min port.");
+                throw new ArgumentException("Max port value is less than min port value.");
 
             if (minPort < 0)
                 throw new ArgumentOutOfRangeException(nameof(minPort));
             
             if (maxPort > 65535)
                 throw new ArgumentOutOfRangeException(nameof(maxPort));
-
+            
             var iPHostEntry = Dns.GetHostEntry(Dns.GetHostName());
-
+            
             if (iPHostEntry.AddressList.Length < 1)
-                throw new Exception("Web port scan couldn't be started.");
+                throw new Exception("Web port scan can't be started.");
 
             var host = iPHostEntry.AddressList[0];
 
-            var sResult = Task.WhenAll(
-                Enumerable.Range(minPort, (maxPort - minPort) + 1)
-                                .Select(x => Task.FromResult(GetPortStatus(host, x)))).Result;
+            var taskArray = Enumerable.Range(minPort, (maxPort - minPort) + 1)
+                .Select(x => Task.FromResult(GetPortStatus(host, x)))
+                .ToArray();
             
-            return status != PortStatus.Any ? sResult.Where(x => x.GetStatus() == status) : sResult;
+            var masterTask =  Task.Run(()=> Task.WhenAll(taskArray), cToken);
+            
+            var sResult = await masterTask;
+
+            if (masterTask.Status != TaskStatus.RanToCompletion)
+                throw new Exception("Failed to scan web ports.");
+            
+            var status = sSettings.GetSearchStatus();
+            var targetStatusStr = status.ToString();
+            
+            return status != PortStatus.Any ? sResult.Where(x => x.GetStatusString() == targetStatusStr 
+                                                                 || x.GetStatusString() == "Unknown") : sResult;
         }
 
         /// <summary>
@@ -64,7 +77,6 @@ namespace webport_comport_scanner.Scanner
             {
                 tcpListener = new TcpListener(address, port);
                 tcpListener.Start();
-
                 portStatus = new WebPortStatus(port, PortStatus.Free);
             }
             catch (SocketException)

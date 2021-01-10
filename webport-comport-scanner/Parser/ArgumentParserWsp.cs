@@ -1,12 +1,7 @@
-﻿using System;
+﻿using System.Reflection;
 using MatthiWare.CommandLine;
 using webport_comport_scanner.Option;
 using MatthiWare.CommandLine.Extensions.FluentValidations;
-using System.Linq;
-using webport_comport_scanner.Architecture;
-using webport_comport_scanner.Model;
-using webport_comport_scanner.Printer;
-using webport_comport_scanner.Scanner;
 using webport_comport_scanner.Validator;
 
 namespace webport_comport_scanner.Parser
@@ -25,88 +20,30 @@ namespace webport_comport_scanner.Parser
                 {
                     AppName = "Serial and web port scanner.", 
                     EnableHelpOption = true,
+                    AutoPrintUsageAndErrors = true
                 }
             );
-
+            
             _argParser.UseFluentValidations(configurator => 
-                        configurator.AddValidator<ProgramOptions, PortOptionValidator>());
-
-            _argParser.AddCommand()
-
-                .Name("webPort")
-                .Required(false)
-                .Description("This command scans web ports.")
-                .OnExecuting((o) =>
-                {
-                    Console.WriteLine("Scanning web ports...");
-                    
-                    new PortStatusPrinter().PrintTable(new WebPortScanner()
-                                .Scan(o.MinPort, o.MaxPort, ParseStatus(o.Status)));
-                    
-                    Console.WriteLine("\nDone!");
-                });
-
-            _argParser.AddCommand()
-                .Name("serialPort")
-                .Required(false)
-                .Description("This command scans serial ports.")
-                .OnExecuting((o) => 
-                {   
-                    Console.WriteLine("Scanning serial ports...");
-                    
-                    new PortStatusPrinter().PrintTable(new SerialPortScanner()
-                                .Scan(o.MinPort, o.MaxPort, ParseStatus(o.Status)));
-                                
-                    Console.WriteLine("\nDone!");
-                });
-
+                configurator.AddValidator<ProgramOptions, ProgramOptionsValidator>());
+            
             _argParser.AddCommand()
                 .Name("help")
                 .Required(false)
                 .Description("This command displays program options.")
                 .OnExecuting((o) => _argParser.Printer.PrintUsage());
+            
+            _argParser.DiscoverCommands(Assembly.GetExecutingAssembly());
         }
 
         /// <summary>
         /// Parses given arguments and starts executing commands.
         /// </summary>
         /// <param name="args">Program arguments.</param>
-        public void Parse(string[] args)
+        public async void ParseAsync(string[] args)
         {
-            if(args.Length < 1)
-            {
-                Console.WriteLine("Error: No command or arguments given.");
-                _argParser.Printer.PrintUsage();
-                return;
-            }
-
-            // check for invalid command/arguments.
-            if (_argParser.Commands.All(x => x.Name != args[0]) && args[0] != "--help")
-            {
-                Console.WriteLine("Error: Invalid command given.");
-                _argParser.Printer.PrintUsage();
-                return;
-            }
-
-            _argParser.Parse(args);
-        }
-
-        /// <summary>
-        /// A string representing interpretation of port status.
-        /// </summary>
-        /// <exception cref="ArgumentException">If status value is invalid.</exception>
-        /// <param name="status"></param>
-        /// <returns>Enum type of port status.</returns>
-        private static PortStatus ParseStatus(string status)
-        {
-            // To avoid "problems" with upper and lower case thing, better for user.
-            var strEnum = status.First().ToString().ToUpper() 
-                          + status.Substring(1, status.Length - 1).ToLower();
-            
-            if (!Enum.TryParse(strEnum, out PortStatus portStatus))
-                throw new ArgumentException("Invalid status.");
-
-            return portStatus;
+            // no need to print errors, because of 'AutoPrintUsageAndErrors = true'
+            await _argParser.ParseAsync(args);
         }
     }
 }

@@ -1,32 +1,25 @@
-﻿using webport_comport_scanner.Architecture;
-
-namespace webport_comport_scanner.Model
+﻿namespace webport_comport_scanner.Model
 {
     /// <summary>
     /// Represents web port and its status.
     /// </summary>
     public class WebPortStatus : IPrintablePortStatus
     {
-        private readonly int _port;
-        private readonly PortStatus _status;
+        private readonly string _name;
+        private readonly string _status;
 
         public WebPortStatus(int port, PortStatus status)
         {
-            _port = port;
-            _status = status;
+            _name = port.ToString();
+            _status = status.ToString();
         }
         
         public string GetName()
         {
-            return _port.ToString();
+            return _name;
         }
 
         public string GetStatusString()
-        {
-            return _status.ToString();
-        }
-
-        public PortStatus GetStatus()
         {
             return _status;
         }

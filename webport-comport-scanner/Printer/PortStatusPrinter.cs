@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using webport_comport_scanner.Architecture;
+using webport_comport_scanner.Model;
 
 namespace webport_comport_scanner.Printer
 {
@@ -25,11 +25,11 @@ namespace webport_comport_scanner.Printer
         public PortStatusPrinter()
         {
             Console.OutputEncoding = Encoding.Unicode;
-            _bufferedStream = new BufferedStream(Console.OpenStandardOutput(), 8192);
+            _bufferedStream = new BufferedStream(Console.OpenStandardOutput(), 4096);
         }
         
         /// <summary>
-        /// Prints a collection of port status in console as table. 
+        /// Print a collection of port status in console as table. 
         /// </summary>
         /// <param name="portStatuses">A collection of type port status.</param>
         public void PrintTable(IEnumerable<IPrintablePortStatus> portStatuses)
@@ -59,8 +59,8 @@ namespace webport_comport_scanner.Printer
         /// <summary>
         /// Fill string with empty chars to length.
         /// </summary>
-        /// <param name="value">Value to print.</param>
-        /// <param name="length">Column length.</param>
+        /// <param name="value">Value to fill to size.</param>
+        /// <param name="length">Expected string length.</param>
         /// <returns>A string of length of column filled with empty sequence.</returns>
         private static string FillStringToLen(string value, int length)
         {
