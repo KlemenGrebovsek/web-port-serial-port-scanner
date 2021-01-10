@@ -8,7 +8,7 @@ namespace webport_comport_scanner.Scanner
     public interface IPortScanner
     {
         /// <summary>
-        /// ScanAsync for ports and their status.
+        /// Scans for ports and their status async.
         /// </summary>
         /// <param name="sSettings">Object containing all scan settings.</param>
         /// <param name="cToken">CancellationToken object.</param>

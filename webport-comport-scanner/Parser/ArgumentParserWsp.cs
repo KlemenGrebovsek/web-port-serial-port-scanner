@@ -37,7 +37,7 @@ namespace webport_comport_scanner.Parser
         }
 
         /// <summary>
-        /// Parses given arguments and starts executing commands.
+        /// Parses given arguments and starts executing command.
         /// </summary>
         /// <param name="args">Program arguments.</param>
         public async void ParseAsync(string[] args)

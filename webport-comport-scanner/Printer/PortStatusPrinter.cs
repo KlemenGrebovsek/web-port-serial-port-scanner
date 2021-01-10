@@ -29,7 +29,7 @@ namespace webport_comport_scanner.Printer
         }
         
         /// <summary>
-        /// Print a collection of port status in console as table. 
+        /// Prints a collection of port status in console as table. 
         /// </summary>
         /// <param name="portStatuses">A collection of type port status.</param>
         public void PrintTable(IEnumerable<IPrintablePortStatus> portStatuses)
@@ -57,9 +57,9 @@ namespace webport_comport_scanner.Printer
         }
         
         /// <summary>
-        /// Fill string with empty chars to length.
+        /// Fills string with empty chars to length.
         /// </summary>
-        /// <param name="value">Value to fill to size.</param>
+        /// <param name="value">Value to fill.</param>
         /// <param name="length">Expected string length.</param>
         /// <returns>A string of length of column filled with empty sequence.</returns>
         private static string FillStringToLen(string value, int length)

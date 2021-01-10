@@ -21,7 +21,7 @@ namespace webport_comport_scanner.Scanner
         /// <exception cref="Exception">If scan of ports can't be started or any other reason.</exception>
         /// <param name="sSettings">Object containing all scan settings.</param>
         /// <param name="cToken">CancellationToken object.</param>
-        /// <returns>A collection of type serial port status in range of [min-max].</returns>
+        /// <returns>A collection of type serial port statuses.</returns>
         public async Task<IEnumerable<IPrintablePortStatus>> ScanAsync(IScanProperties sSettings, CancellationToken cToken)
         {
             var minPort = sSettings.GetMinPort();
@@ -48,12 +48,12 @@ namespace webport_comport_scanner.Scanner
             var status = sSettings.GetSearchStatus();
             var targetStatus = status.ToString();
 
-            return status != PortStatus.Any ? sResult.Where(x => x.GetStatusString() == targetStatus 
-                                                                 || x.GetStatusString() == "Unknown") : sResult;
+            return status != PortStatus.Any ? sResult.Where(x => 
+                                                            x.GetStatusString() == targetStatus) : sResult;
         }
 
         /// <summary>
-        /// Checks status of serial ports.
+        /// Check status of serial ports.
         /// </summary>
         /// <returns>A collection of serial port status.</returns>
         private static IEnumerable<SerialPortStatus> GetPortStatus(IEnumerable<string> serialPorts)
@@ -72,7 +72,7 @@ namespace webport_comport_scanner.Scanner
                 }
                 catch (UnauthorizedAccessException)
                 {
-                    serialPortStatus = new SerialPortStatus(portName, PortStatus.In_use);
+                    serialPortStatus = new SerialPortStatus(portName, PortStatus.InUse);
                 }
                 catch (Exception)
                 {

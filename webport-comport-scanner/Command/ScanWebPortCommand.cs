@@ -6,12 +6,11 @@ using webport_comport_scanner.Model;
 using webport_comport_scanner.Option;
 using webport_comport_scanner.Printer;
 using webport_comport_scanner.Scanner;
-using webport_comport_scanner.Util;
 
 namespace webport_comport_scanner.Command
 {
     /// <summary>
-    /// Searches for web ports and checks their status.
+    /// Scans for web ports and their status.
     /// </summary>
     public class ScanWebPortCommand : Command<ProgramOptions, CommandOptions>
     {
@@ -29,16 +28,20 @@ namespace webport_comport_scanner.Command
         {
             Console.WriteLine("Scanning for web ports...");
             
+            if (!Enum.TryParse(pOptions.Status, out PortStatus portStatus))
+            {
+                Console.WriteLine("Invalid port status.");
+                return;
+            }
+            
             try
             {
                 var portScanner = new WebPortScanner();
-                var settings = new ScanProperties(pOptions.MinPort, pOptions.MaxPort, 
-                                                                    ProgramUtil.TransformOptionStatus(pOptions.Status));
+                var settings = new ScanProperties(pOptions.MinPort, pOptions.MaxPort, portStatus);
 
                 var scanResult = await portScanner.ScanAsync(settings, cToken);
                 
-                var printer = new PortStatusPrinter();
-                printer.PrintTable(scanResult);
+                new PortStatusPrinter().PrintTable(scanResult);
                 
                 Console.WriteLine("\nDone.");
             }

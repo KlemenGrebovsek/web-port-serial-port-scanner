@@ -22,7 +22,7 @@ namespace webport_comport_scanner.Scanner
         /// <exception cref="Exception">If scan of ports can't be started or any other reason.</exception>
         /// <param name="sSettings">Object containing all scan settings.</param>
         /// <param name="cToken">CancellationToken object.</param>
-        /// <returns>A collection of type web port status in range of [min-max].</returns>
+        /// <returns>A collection of type web port statuses.</returns>
         public async Task<IEnumerable<IPrintablePortStatus>> ScanAsync(IScanProperties sSettings, CancellationToken cToken)
         {
             var minPort = sSettings.GetMinPort();
@@ -45,25 +45,25 @@ namespace webport_comport_scanner.Scanner
             var host = iPHostEntry.AddressList[0];
 
             var taskArray = Enumerable.Range(minPort, (maxPort - minPort) + 1)
-                .Select(x => Task.FromResult(GetPortStatus(host, x)))
-                .ToArray();
+                                                        .Select(x => Task.FromResult(GetPortStatus(host, x)))
+                                                        .ToArray();
             
             var masterTask =  Task.Run(()=> Task.WhenAll(taskArray), cToken);
             
             var sResult = await masterTask;
-
-            if (masterTask.Status != TaskStatus.RanToCompletion)
-                throw new Exception("Failed to scan web ports.");
             
             var status = sSettings.GetSearchStatus();
             var targetStatusStr = status.ToString();
             
-            return status != PortStatus.Any ? sResult.Where(x => x.GetStatusString() == targetStatusStr 
-                                                                 || x.GetStatusString() == "Unknown") : sResult;
+            if (masterTask.Status != TaskStatus.RanToCompletion)
+                throw new Exception("Failed to scan web ports.");
+            
+            return status != PortStatus.Any ? sResult.Where(x => 
+                                                            x.GetStatusString() == targetStatusStr) : sResult;
         }
 
         /// <summary>
-        /// Checks status of specific port.
+        /// Check status of specific port.
         /// </summary>
         /// <param name="address">Host ip address.</param>
         /// <param name="port">Port number.</param>
@@ -81,7 +81,7 @@ namespace webport_comport_scanner.Scanner
             }
             catch (SocketException)
             {
-                portStatus = new WebPortStatus(port, PortStatus.In_use);
+                portStatus = new WebPortStatus(port, PortStatus.InUse);
             }
             catch (Exception)
             {

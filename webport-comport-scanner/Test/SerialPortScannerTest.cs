@@ -1,5 +1,4 @@
 using System;
-using System.IO.Ports;
 using Xunit;
 using System.Collections.Generic;
 using System.Linq;
@@ -112,8 +111,9 @@ namespace webport_comport_scanner.Test
 
         [Theory]
         [InlineData(PortStatus.Free)]
-        [InlineData(PortStatus.In_use)]
+        [InlineData(PortStatus.InUse)]
         [InlineData(PortStatus.Any)]
+        [InlineData(PortStatus.Unknown)]
         public void Test_ValidPortStatus(PortStatus status)
         {
             const int minPort = 1;
@@ -146,8 +146,7 @@ namespace webport_comport_scanner.Test
             else
             {
                 var portStatusString = status.ToString();
-                statusOk = sResult.All(x => x.GetStatusString() == portStatusString ||
-                                            x.GetStatusString() == "Unknown");
+                statusOk = sResult.All(x => x.GetStatusString() == portStatusString);
             }
             
             Assert.True(statusOk);

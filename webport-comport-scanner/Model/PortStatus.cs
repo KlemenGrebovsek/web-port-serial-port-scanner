@@ -5,6 +5,6 @@
     /// </summary>
     public enum PortStatus
     {
-        In_use, Free, Unknown, Any
+        InUse, Free, Unknown, Any
     }
 }
