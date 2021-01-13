@@ -19,14 +19,12 @@ namespace webport_comport_scanner.Scanner
         /// <exception cref="ArgumentException">If min and max port are logically wrong.</exception>
         /// <exception cref="ArgumentOutOfRangeException">If min or max value is outside the port range. </exception>
         /// <exception cref="Exception">If scan of ports can't be started or any other reason.</exception>
-        /// <param name="sSettings">Object containing all scan settings.</param>
+        /// <param name="minPort">Scan from this port (including).</param>
+        /// <param name="maxPort">Scan to this port (including).</param>
         /// <param name="cToken">CancellationToken object.</param>
         /// <returns>A collection of type serial port statuses.</returns>
-        public async Task<IEnumerable<IPrintablePortStatus>> ScanAsync(IScanProperties sSettings, CancellationToken cToken)
+        public IEnumerable<Task<IPrintablePortStatus>> Scan(int minPort, int maxPort, CancellationToken cToken)
         {
-            var minPort = sSettings.GetMinPort();
-            var maxPort = sSettings.GetMaxPort();
-            
             if (maxPort < minPort)
                 throw new ArgumentException("Max port value is less than min port value.");
             
@@ -43,49 +41,48 @@ namespace webport_comport_scanner.Scanner
             if (serialPorts.Count < 1)
                 throw new Exception("No serial port found.");
 
-            var sResult = await Task.Run(() => GetPortStatus(serialPorts), cToken);
+            var totalTasks = (maxPort - minPort) + 1;
+            var taskList = new List<Task<IPrintablePortStatus>>(totalTasks);
 
-            var status = sSettings.GetSearchStatus();
-            var targetStatus = status.ToString();
+            for (var i = minPort; i < maxPort + 1; i++)
+            {
+                cToken.ThrowIfCancellationRequested();
+                taskList.Add(Task.FromResult(GetPortStatus(serialPorts[i])));
+            }
 
-            return status != PortStatus.Any ? sResult.Where(x => 
-                                                            x.GetStatusString() == targetStatus) : sResult;
+            return taskList;
         }
 
         /// <summary>
         /// Check status of serial ports.
         /// </summary>
-        /// <returns>A collection of serial port status.</returns>
-        private static IEnumerable<SerialPortStatus> GetPortStatus(IEnumerable<string> serialPorts)
+        /// <returns>Serial port status.</returns>
+        private static IPrintablePortStatus GetPortStatus(string portName)
         {
             SerialPort serialPort = null;
             SerialPortStatus serialPortStatus = null;
 
-            foreach(var portName in serialPorts)
+            try
             {
-                
-                try
-                {
-                    serialPort = new SerialPort(portName);
-                    serialPort.Open();
-                    serialPortStatus = new SerialPortStatus(portName, PortStatus.Free);
-                }
-                catch (UnauthorizedAccessException)
-                {
-                    serialPortStatus = new SerialPortStatus(portName, PortStatus.InUse);
-                }
-                catch (Exception)
-                {
-                    serialPortStatus = new SerialPortStatus(portName, PortStatus.Unknown);
-                }
-                finally
-                {
-                    if (serialPort != null && serialPort.IsOpen)
-                        serialPort.Close();
-                }
+                serialPort = new SerialPort(portName);
+                serialPort.Open();
+                serialPortStatus = new SerialPortStatus(portName, PortStatus.Free);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                serialPortStatus = new SerialPortStatus(portName, PortStatus.InUse);
+            }
+            catch (Exception)
+            {
+                serialPortStatus = new SerialPortStatus(portName, PortStatus.Unknown);
+            }
+            finally
+            {
+                if (serialPort != null && serialPort.IsOpen)
+                    serialPort.Close();
             }
 
-            yield return serialPortStatus;
+            return serialPortStatus;
         }
     }
 }

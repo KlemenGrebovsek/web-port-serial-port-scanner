@@ -1,7 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Text;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using webport_comport_scanner.Model;
 
 namespace webport_comport_scanner.Printer
@@ -19,41 +20,47 @@ namespace webport_comport_scanner.Printer
 
         // Represents column width (number of chars).
         private const int ColWidth = 13;
-        
-        private readonly BufferedStream _bufferedStream;
 
-        public PortStatusPrinter()
+        private readonly TextWriter _writer;
+
+        public PortStatusPrinter(TextWriter textWriter)
         {
-            Console.OutputEncoding = Encoding.Unicode;
-            _bufferedStream = new BufferedStream(Console.OpenStandardOutput(), 4096);
+            _writer = textWriter;
         }
+        
         
         /// <summary>
         /// Prints a collection of port status in console as table. 
         /// </summary>
         /// <param name="portStatuses">A collection of type port status.</param>
-        public void PrintTable(IEnumerable<IPrintablePortStatus> portStatuses)
+        /// <param name="cToken">A cancellation token</param>
+        public async Task PrintTableAsync(IEnumerable<IPrintablePortStatus> portStatuses, CancellationToken cToken)
         {
-            if (portStatuses == null)
+            if (!portStatuses.Any())
+            {
+                await _writer.WriteAsync("No port to print.");
+                await _writer.FlushAsync();
                 return;
+            }
+                
             
             // Define table line which will be printed after each row.
-            var tableLine = Encoding.Unicode.GetBytes($"\n+{new string('-', (ColWidth * 2) + 1 )}+");
-
-            _bufferedStream.Write(Encoding.Unicode.GetBytes($"\n {FillStringToLen(PortHeader, ColWidth)}" +
-                                                            $" {FillStringToLen(StatusHeader, ColWidth)} "));
-
+            var tableLine = $"\n+{new string('-', (ColWidth * 2) + 1 )}+";
+            
+            await _writer.WriteAsync($"\n {FillStringToLen(PortHeader, ColWidth)}" +
+                                     $" {FillStringToLen(StatusHeader, ColWidth)} ");
+            
             // Generate rows of table
             foreach (var result in portStatuses)
             {
-                _bufferedStream.Write(tableLine);
-                _bufferedStream.Write(Encoding.Unicode.GetBytes($"\n|{FillStringToLen(result.GetName(), ColWidth)}|" +
-                                                                $"{FillStringToLen(result.GetStatusString(), ColWidth)}|"));
+                cToken.ThrowIfCancellationRequested();
+                await _writer.WriteAsync(tableLine);
+                await _writer.WriteAsync($"\n|{FillStringToLen(result.GetName(), ColWidth)}|" +
+                                         $"{FillStringToLen(result.GetStatusString(), ColWidth)}|");
             }
             
-            _bufferedStream.Write(tableLine);
-            _bufferedStream.Flush();
-            _bufferedStream.Close();
+            await _writer.WriteAsync(tableLine + "\n");
+            await _writer.FlushAsync();
         }
         
         /// <summary>

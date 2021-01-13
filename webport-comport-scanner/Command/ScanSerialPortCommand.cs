@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MatthiWare.CommandLine.Abstractions.Command;
@@ -26,28 +27,35 @@ namespace webport_comport_scanner.Command
 
         public override async Task OnExecuteAsync(ProgramOptions pOptions, CommandOptions cOptions, CancellationToken cToken)
         {
-            Console.WriteLine("Scanning for serial ports...");
-
             if (!Enum.TryParse(pOptions.Status, out PortStatus portStatus))
             {
                 Console.WriteLine("Invalid port status.");
                 return;
             }
             
+            Console.WriteLine("Scanning for serial ports...");
+            
             try
             {
-                var portScanner = new SerialPortScanner();
-                var settings = new ScanProperties(pOptions.MinPort, pOptions.MaxPort, portStatus);
 
-                var scanResult = await portScanner.ScanAsync(settings, cToken);
-                
-                new PortStatusPrinter().PrintTable(scanResult);
-                
-                Console.WriteLine("\nDone.");
+                var portScanner = new SerialPortScanner();
+                var scanResult =  await Task.WhenAll(portScanner.Scan(pOptions.MinPort, pOptions.MaxPort, cToken));
+                var printer = new PortStatusPrinter(Console.Out);
+
+                if (portStatus != PortStatus.Any)
+                {
+                    await printer.PrintTableAsync(scanResult
+                        .Where(x => x.GetStatusString() == pOptions.Status), cToken);
+                }
+                else
+                {
+                    await printer.PrintTableAsync(scanResult, cToken);
+                }
             }
             catch (Exception e)
             {
-                Console.WriteLine($"Command 'serialPort', ran into exception: {e.Message}");
+                if (!cToken.IsCancellationRequested)
+                    Console.WriteLine($"Command 'serialPort', ran into exception: {e.Message}");
             }
         }
     }

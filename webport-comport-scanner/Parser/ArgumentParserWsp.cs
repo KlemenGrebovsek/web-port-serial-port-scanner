@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using MatthiWare.CommandLine;
 using webport_comport_scanner.Option;
 using MatthiWare.CommandLine.Extensions.FluentValidations;
@@ -42,8 +43,13 @@ namespace webport_comport_scanner.Parser
         /// <param name="args">Program arguments.</param>
         public async void ParseAsync(string[] args)
         {
-            // no need to print errors, because of 'AutoPrintUsageAndErrors = true'
-            await _argParser.ParseAsync(args);
+            var parserResult = await _argParser.ParseAsync(args);
+
+            if (!parserResult.HasErrors) return;
+            
+            foreach (var exception in parserResult.Errors)
+                Console.WriteLine(exception.Message);
+
         }
     }
 }

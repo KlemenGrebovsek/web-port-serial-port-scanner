@@ -1,12 +1,14 @@
-﻿using webport_comport_scanner.Parser;
+﻿using System.Threading.Tasks;
+using webport_comport_scanner.Parser;
 
 namespace webport_comport_scanner
 {
     public class WebSerialPortScanner
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
-            new ArgumentParserWsp().ParseAsync(args);
+            var parser = new ArgumentParserWsp();
+            await Task.Run(() => parser.ParseAsync(args));
         }
     }
 }

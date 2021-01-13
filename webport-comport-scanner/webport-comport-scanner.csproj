@@ -1,18 +1,18 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>webport_comport_scanner</RootNamespace>
     <GenerateProgramFile>false</GenerateProgramFile>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="FluentValidation" Version="9.3.0" />
-    <PackageReference Include="MatthiWare.CommandLineParser" Version="0.5.0" />
-    <PackageReference Include="MatthiWare.CommandLineParser.Extensions.FluentValidations" Version="0.5.0" />
+    <PackageReference Include="MatthiWare.CommandLineParser" Version="0.5.2" />
+    <PackageReference Include="MatthiWare.CommandLineParser.Extensions.FluentValidations" Version="0.5.2" />
     <PackageReference Include="System.IO.Ports" Version="5.0.0" />
     <PackageReference Include="xunit.core" Version="2.4.1" />
     <PackageReference Include="xunit.assert" Version="2.4.1" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.8.0-preview-20200921-01" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.8.3" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3" />
     <PackageReference Include="xunit.abstractions" Version="2.0.3" />
     <PackageReference Include="xunit.extensibility.core" Version="2.4.1" />
