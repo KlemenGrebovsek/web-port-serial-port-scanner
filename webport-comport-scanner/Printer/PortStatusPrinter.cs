@@ -42,21 +42,22 @@ namespace webport_comport_scanner.Printer
                 await _writer.FlushAsync();
                 return;
             }
-                
             
             // Define table line which will be printed after each row.
             var tableLine = $"\n+{new string('-', (ColWidth * 2) + 1 )}+";
-            
-            await _writer.WriteAsync($"\n {FillStringToLen(PortHeader, ColWidth)}" +
-                                     $" {FillStringToLen(StatusHeader, ColWidth)} ");
+
+            // Table header print
+            await _writer.WriteAsync($"\n {FillStringToLen(PortHeader, ColWidth)}"); 
+            await _writer.WriteAsync($" {FillStringToLen(StatusHeader, ColWidth)} ");
             
             // Generate rows of table
             foreach (var result in portStatuses)
             {
                 cToken.ThrowIfCancellationRequested();
+                
                 await _writer.WriteAsync(tableLine);
-                await _writer.WriteAsync($"\n|{FillStringToLen(result.GetName(), ColWidth)}|" +
-                                         $"{FillStringToLen(result.GetStatusString(), ColWidth)}|");
+                await _writer.WriteAsync($"\n|{FillStringToLen(result.GetName(), ColWidth)}|");
+                await _writer.WriteAsync($"{FillStringToLen(result.GetStatusString(), ColWidth)}|");
             }
             
             await _writer.WriteAsync(tableLine + "\n");
@@ -71,8 +72,7 @@ namespace webport_comport_scanner.Printer
         /// <returns>A string of length of column filled with empty sequence.</returns>
         private static string FillStringToLen(string value, int length)
         {
-            return string.Format($"{{0,{length * -1}}}", string.Format("{0," +
-                ((length + value.Length) / 2) + "}", value));
+            return string.Format($"{{0,{length * -1}}}", string.Format($"{{0,{(length + value.Length) / 2}}}", value));
         }
     }
 }

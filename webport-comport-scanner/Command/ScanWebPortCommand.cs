@@ -38,13 +38,14 @@ namespace webport_comport_scanner.Command
             try
             {
                 var portScanner = new WebPortScanner();
-                var scanResult = await Task.WhenAll(portScanner.Scan(pOptions.MinPort, pOptions.MaxPort, cToken));
                 var printer = new PortStatusPrinter(Console.Out);
-
+                
+                var scanResult = await Task.WhenAll(portScanner.Scan(pOptions.MinPort, pOptions.MaxPort, cToken));
+                
                 if (portStatus != PortStatus.Any)
                 {
                     await printer.PrintTableAsync(scanResult
-                        .Where(x => x.GetStatusString() == pOptions.Status), cToken);
+                                 .Where(x => x.GetStatusString() == pOptions.Status), cToken);
                 }
                 else
                 {

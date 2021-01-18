@@ -16,17 +16,17 @@ namespace webport_comport_scanner.Parser
 
         public ArgumentParserWsp()
         {
-            _argParser = new CommandLineParser<ProgramOptions>(
-                new CommandLineParserOptions
-                {
-                    AppName = "Serial and web port scanner.", 
-                    EnableHelpOption = true,
-                    AutoPrintUsageAndErrors = true
-                }
-            );
+            var parserOptions = new CommandLineParserOptions
+            {
+                AppName = "Serial and web port scanner.",
+                EnableHelpOption = true,
+                AutoPrintUsageAndErrors = true
+            };
             
-            _argParser.UseFluentValidations(configurator => 
-                configurator.AddValidator<ProgramOptions, ProgramOptionsValidator>());
+            _argParser = new CommandLineParser<ProgramOptions>(parserOptions);
+            
+            _argParser.UseFluentValidations(configurator => configurator
+                      .AddValidator<ProgramOptions, ProgramOptionsValidator>());
             
             _argParser.AddCommand()
                 .Name("help")

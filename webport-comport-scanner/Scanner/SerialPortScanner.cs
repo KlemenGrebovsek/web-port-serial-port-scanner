@@ -35,8 +35,7 @@ namespace webport_comport_scanner.Scanner
                 throw new ArgumentOutOfRangeException(nameof(maxPort));
 
             var serialPorts = SerialPort.GetPortNames()
-                                                  .Where(x => int.Parse(x.Substring(3)) >= minPort && 
-                                                                    int.Parse(x.Substring(3)) <= maxPort).ToList();
+                .Where(x => int.Parse(x.Substring(3)) >= minPort && int.Parse(x.Substring(3)) <= maxPort).ToList();
 
             if (serialPorts.Count < 1)
                 throw new Exception("No serial port found.");
