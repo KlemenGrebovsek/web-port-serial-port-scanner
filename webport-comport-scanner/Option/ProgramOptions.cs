@@ -1,4 +1,5 @@
 ﻿using MatthiWare.CommandLine.Core.Attributes;
+using webport_comport_scanner.Model;
 
 namespace webport_comport_scanner.Option
 {
@@ -19,7 +20,7 @@ namespace webport_comport_scanner.Option
 
         [Name("s", "status")]
         [Description("Scans for ports that have this status. (Any, Free, InUse, Unknown).")]
-        [DefaultValue("Any")]
-        public string Status { get; set; }
+        [DefaultValue(PortStatus.Any)]
+        public PortStatus Status { get; set; }
     }
 }

@@ -1,11 +1,15 @@
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
 namespace webport_comport_scanner.Parser
 {
     public interface IArgumentParser
     {
         /// <summary>
-        /// Parse given arguments and execute command.
+        /// Parses given arguments and starts executing command.
         /// </summary>
         /// <param name="args">Program arguments.</param>
-        void ParseAsync(string[] args);
+        /// <returns>Collection of error messages if any.</returns>
+        Task<IEnumerable<string>> ParseAsync (string[] args);
     }
 }

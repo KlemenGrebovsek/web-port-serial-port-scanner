@@ -23,7 +23,7 @@ namespace webport_comport_scanner.Scanner
         /// <param name="maxPort">Scan to this port (including).</param>
         /// <param name="cToken">CancellationToken object.</param>
         /// <returns>A collection of type web port statuses.</returns>
-        public IEnumerable<Task<IPrintablePortStatus>> Scan(int minPort, int maxPort, CancellationToken cToken)
+        public async Task<IEnumerable<IPrintablePortStatus>> ScanAsync(int minPort, int maxPort, CancellationToken cToken)
         {
             if (maxPort < minPort)
                 throw new ArgumentException("Max port value is less than min port value.");
@@ -41,8 +41,7 @@ namespace webport_comport_scanner.Scanner
 
             var host = iPHostEntry.AddressList[0];
             
-            var totalTasks = (maxPort - minPort) + 1;
-            var taskList = new List<Task<IPrintablePortStatus>>(totalTasks);
+            var taskList = new List<Task<IPrintablePortStatus>>((maxPort - minPort) + 1);
 
             for (var i = minPort; i < maxPort + 1; i++)
             {
@@ -50,7 +49,7 @@ namespace webport_comport_scanner.Scanner
                 taskList.Add(Task.FromResult(GetPortStatus(host, i)));
             }
             
-            return taskList;
+            return await Task.Run(() => Task.WhenAll(taskList), cToken);
         }
 
         /// <summary>

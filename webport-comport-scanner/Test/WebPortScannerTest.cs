@@ -12,24 +12,19 @@ namespace webport_comport_scanner.Test
         public void Test_MinPortLimit()
         {
             var spScanner = new WebPortScanner();
-            var cancellationTokenSource = new CancellationTokenSource();
+            using var cancellationTokenSource = new CancellationTokenSource();
             var cToken = cancellationTokenSource.Token; 
             
             try
             {
-                Assert.ThrowsAsync<ArgumentOutOfRangeException>( () =>
+                Assert.ThrowsAsync<ArgumentOutOfRangeException>( async () =>
                 {
-                    spScanner.Scan(-1, 3, cToken);
-                    return null;
+                    await spScanner.ScanAsync(-1, 3, cToken);
                 });
             }
             catch (Exception e)
             {
                 Assert.True(false, e.Message);
-            }
-            finally
-            {
-                cancellationTokenSource.Dispose(); 
             }
         }
 
@@ -37,24 +32,19 @@ namespace webport_comport_scanner.Test
         public void Test_MaxPortLimit()
         {
             var spScanner = new WebPortScanner();
-            var cancellationTokenSource = new CancellationTokenSource();
+            using var cancellationTokenSource = new CancellationTokenSource();
             var cToken = cancellationTokenSource.Token; 
             
             try
             {
-                Assert.ThrowsAsync<ArgumentOutOfRangeException>(() =>
+                Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () =>
                 {
-                    spScanner.Scan(1, 65536, cToken);
-                    return null;
+                    await spScanner.ScanAsync(1, 65536, cToken);
                 });
             }
             catch (Exception e)
             {
                 Assert.True(false, e.Message);
-            }
-            finally
-            {
-                cancellationTokenSource.Dispose(); 
             }
         }
 
@@ -62,24 +52,19 @@ namespace webport_comport_scanner.Test
         public void Test_InvalidPortScanRange()
         {
             var spScanner = new WebPortScanner();
-            var cancellationTokenSource = new CancellationTokenSource();
+            using var cancellationTokenSource = new CancellationTokenSource();
             var cToken = cancellationTokenSource.Token; 
             
             try
             {
-                Assert.ThrowsAsync<ArgumentException>(() =>
+                Assert.ThrowsAsync<ArgumentException>(async () =>
                 {
-                    spScanner.Scan(3, 1, cToken);
-                    return null;
+                    await spScanner.ScanAsync(3, 1, cToken);
                 });
             }
             catch (Exception e)
             {
                 Assert.True(false, e.Message);
-            }
-            finally
-            {
-                cancellationTokenSource.Dispose(); 
             }
         }
 
@@ -90,7 +75,7 @@ namespace webport_comport_scanner.Test
         public void Test_PortScanRange(int minPort, int maxPort)
         {
             var spScanner = new WebPortScanner();
-            var cancellationTokenSource = new CancellationTokenSource();
+            using var cancellationTokenSource = new CancellationTokenSource();
             var cToken = cancellationTokenSource.Token;
 
             var totalPorts = (maxPort - minPort) + 1;
@@ -98,7 +83,7 @@ namespace webport_comport_scanner.Test
             
             try
             {
-                actual = spScanner.Scan(minPort, maxPort, cToken).Count();
+                actual = spScanner.ScanAsync(minPort, maxPort, cToken).Result.Count();
             }
             catch (Exception e)
             {

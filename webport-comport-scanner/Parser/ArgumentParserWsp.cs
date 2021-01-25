@@ -1,5 +1,7 @@
-﻿using System;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using MatthiWare.CommandLine;
 using webport_comport_scanner.Option;
 using MatthiWare.CommandLine.Extensions.FluentValidations;
@@ -41,15 +43,15 @@ namespace webport_comport_scanner.Parser
         /// Parses given arguments and starts executing command.
         /// </summary>
         /// <param name="args">Program arguments.</param>
-        public async void ParseAsync(string[] args)
+        /// <returns>Collection of errors if any.</returns>
+        public async Task<IEnumerable<string>> ParseAsync(string[] args)
         {
             var parserResult = await _argParser.ParseAsync(args);
 
-            if (!parserResult.HasErrors) return;
-            
-            foreach (var exception in parserResult.Errors)
-                Console.WriteLine(exception.Message);
+            if (!parserResult.HasErrors) 
+                return parserResult.Errors.Select(x => x.Message);
 
+            return Enumerable.Empty<string>();
         }
     }
 }

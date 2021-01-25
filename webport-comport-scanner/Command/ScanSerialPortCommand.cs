@@ -27,36 +27,31 @@ namespace webport_comport_scanner.Command
 
         public override async Task OnExecuteAsync(ProgramOptions pOptions, CommandOptions cOptions, CancellationToken cToken)
         {
-            if (!Enum.TryParse(pOptions.Status, out PortStatus portStatus))
-            {
-                Console.WriteLine("Invalid port status.");
-                return;
-            }
-            
             Console.WriteLine("Scanning for serial ports...");
+            
+            var portScanner = new SerialPortScanner();
+            var printer = new PortStatusPrinter(Console.Out);
             
             try
             {
-
-                var portScanner = new SerialPortScanner();
-                var printer = new PortStatusPrinter(Console.Out);
+                var scanResult = await portScanner.ScanAsync(pOptions.MinPort, pOptions.MaxPort, cToken);
                 
-                var scanResult =  await Task.WhenAll(portScanner.Scan(pOptions.MinPort, pOptions.MaxPort, cToken));
-                
-                if (portStatus != PortStatus.Any)
+                if (pOptions.Status != PortStatus.Any)
                 {
+                    var stringStatus = pOptions.Status.ToString();
+                    
                     await printer.PrintTableAsync(scanResult
-                                 .Where(x => x.GetStatusString() == pOptions.Status), cToken);
+                                 .Where(x => x.GetStatusString() == stringStatus), cToken);
                 }
                 else
                 {
                     await printer.PrintTableAsync(scanResult, cToken);
                 }
             }
+            catch (TaskCanceledException) { }
             catch (Exception e)
             {
-                if (!cToken.IsCancellationRequested)
-                    Console.WriteLine($"Command 'serialPort', ran into exception: {e.Message}");
+                Console.WriteLine($"Command 'serialPort', ran into exception: {e.Message}");
             }
         }
     }

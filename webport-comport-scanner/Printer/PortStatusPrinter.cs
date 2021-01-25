@@ -28,7 +28,6 @@ namespace webport_comport_scanner.Printer
             _writer = textWriter;
         }
         
-        
         /// <summary>
         /// Prints a collection of port status in console as table. 
         /// </summary>
@@ -45,7 +44,7 @@ namespace webport_comport_scanner.Printer
             
             // Define table line which will be printed after each row.
             var tableLine = $"\n+{new string('-', (ColWidth * 2) + 1 )}+";
-
+            
             // Table header print
             await _writer.WriteAsync($"\n {FillStringToLen(PortHeader, ColWidth)}"); 
             await _writer.WriteAsync($" {FillStringToLen(StatusHeader, ColWidth)} ");

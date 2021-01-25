@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using webport_comport_scanner.Parser;
 
 namespace webport_comport_scanner
@@ -8,7 +9,12 @@ namespace webport_comport_scanner
         public static async Task Main(string[] args)
         {
             var parser = new ArgumentParserWsp();
-            await Task.Run(() => parser.ParseAsync(args));
+            
+            var parseErrors = await parser.ParseAsync(args);
+
+            // print if any error
+            foreach (var error in parseErrors)
+                Console.WriteLine(error);
         }
     }
 }
