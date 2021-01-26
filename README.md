@@ -32,7 +32,7 @@ Description: Program searches for ports that have this status. (Any, Free, InUse
 
 **Sample args**
 
-1) webPort -f 100 -t 3000 -s In_use
+1) webPort -f 100 -t 3000 -s InUse
 2) serialPort -t 6
 3) webPort -s Free
 2) serialPort -s Any
