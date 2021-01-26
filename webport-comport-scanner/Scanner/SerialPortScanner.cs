@@ -16,8 +16,6 @@ namespace webport_comport_scanner.Scanner
         /// <summary>
         /// Scans for serial ports and their status.
         /// </summary>
-        /// <exception cref="ArgumentException">If min and max port are logically wrong.</exception>
-        /// <exception cref="ArgumentOutOfRangeException">If min or max value is outside the port range. </exception>
         /// <exception cref="Exception">If scan of ports can't be started or any other reason.</exception>
         /// <param name="minPort">Scan from this port (including).</param>
         /// <param name="maxPort">Scan to this port (including).</param>
@@ -25,16 +23,6 @@ namespace webport_comport_scanner.Scanner
         /// <returns>A collection of type serial port statuses.</returns>
         public async Task<IEnumerable<IPrintablePortStatus>> ScanAsync(int minPort, int maxPort, CancellationToken cToken)
         {
-            if (maxPort < minPort)
-                throw new ArgumentException("Max port value is less than min port value.");
-            
-            if (minPort < 0)
-                throw new ArgumentOutOfRangeException(nameof(minPort));
-            
-            if (maxPort > 65535)
-                throw new ArgumentOutOfRangeException(nameof(maxPort));
-
-            
             var serialPorts = SerialPort.GetPortNames()
                 .Where(x => int.Parse(x.Substring(3)) >= minPort && int.Parse(x.Substring(3)) <= maxPort).ToList();
 
@@ -58,21 +46,21 @@ namespace webport_comport_scanner.Scanner
         /// <returns>Serial port status.</returns>
         private static IPrintablePortStatus GetPortStatus(string portName)
         {
-            SerialPortStatus serialPortStatus;
+            PortStatusData serialPortStatus;
 
             try
             {
                 using var serialPort  = new SerialPort(portName);
                 serialPort.Open();
-                serialPortStatus = new SerialPortStatus(portName, PortStatus.Free);
+                serialPortStatus = new PortStatusData(portName, PortStatus.Free.ToString());
             }
             catch (UnauthorizedAccessException)
             {
-                serialPortStatus = new SerialPortStatus(portName, PortStatus.InUse);
+                serialPortStatus = new PortStatusData(portName, PortStatus.InUse.ToString());
             }
             catch (Exception)
             {
-                serialPortStatus = new SerialPortStatus(portName, PortStatus.Unknown);
+                serialPortStatus = new PortStatusData(portName, PortStatus.Unknown.ToString());
             }
 
             return serialPortStatus;

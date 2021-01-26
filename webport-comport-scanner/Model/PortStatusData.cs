@@ -1,17 +1,17 @@
 ﻿namespace webport_comport_scanner.Model
 {
     /// <summary>
-    /// Represents serial port and its status.
+    /// Represents port and its status.
     /// </summary>
-    public class SerialPortStatus : IPrintablePortStatus
+    public class PortStatusData : IPrintablePortStatus
     {
         private readonly string _name;
         private readonly string _status;
 
-        public SerialPortStatus(string name, PortStatus status)
+        public PortStatusData(string port, string status)
         {
-            _name = name;
-            _status = status.ToString();
+            _name = port;
+            _status = status;
         }
         
         public string GetName()
@@ -23,5 +23,5 @@
         {
             return _status;
         }
-    }
+    }  
 }

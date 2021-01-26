@@ -4,7 +4,7 @@ using webport_comport_scanner.Parser;
 
 namespace webport_comport_scanner
 {
-    public class WebSerialPortScanner
+    public static class WebSerialPortScanner
     {
         public static async Task Main(string[] args)
         {

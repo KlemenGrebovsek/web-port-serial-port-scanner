@@ -16,8 +16,6 @@ namespace webport_comport_scanner.Scanner
         /// <summary>
         /// Scan for web ports and their status.
         /// </summary>
-        /// <exception cref="ArgumentException">If min and max port are logically wrong.</exception>
-        /// <exception cref="ArgumentOutOfRangeException">If min or max value is outside the port range. </exception>
         /// <exception cref="Exception">If scan of ports can't be started or any other reason.</exception>
         /// <param name="minPort">Scan from this port (including).</param>
         /// <param name="maxPort">Scan to this port (including).</param>
@@ -25,15 +23,6 @@ namespace webport_comport_scanner.Scanner
         /// <returns>A collection of type web port statuses.</returns>
         public async Task<IEnumerable<IPrintablePortStatus>> ScanAsync(int minPort, int maxPort, CancellationToken cToken)
         {
-            if (maxPort < minPort)
-                throw new ArgumentException("Max port value is less than min port value.");
-
-            if (minPort < 0)
-                throw new ArgumentOutOfRangeException(nameof(minPort));
-            
-            if (maxPort > 65535)
-                throw new ArgumentOutOfRangeException(nameof(maxPort));
-            
             var iPHostEntry = Dns.GetHostEntry(Dns.GetHostName());
             
             if (iPHostEntry.AddressList.Length < 1)
@@ -61,28 +50,28 @@ namespace webport_comport_scanner.Scanner
         private static IPrintablePortStatus GetPortStatus(IPAddress address, int port)
         {
             TcpListener tcpListener = null;
-            WebPortStatus portStatus;
+            PortStatusData portStatusData;
 
             try
             {
                 tcpListener = new TcpListener(address, port);
                 tcpListener.Start();
-                portStatus = new WebPortStatus(port, PortStatus.Free);
+                portStatusData = new PortStatusData(port.ToString(), PortStatus.Free.ToString());
             }
             catch (SocketException)
             {
-                portStatus = new WebPortStatus(port, PortStatus.InUse);
+                portStatusData = new PortStatusData(port.ToString(), PortStatus.InUse.ToString());
             }
             catch (Exception)
             {
-                portStatus = new WebPortStatus(port, PortStatus.Unknown);
+                portStatusData = new PortStatusData(port.ToString(), PortStatus.Unknown.ToString());
             }
             finally
             {
                 tcpListener?.Stop();
             }
 
-            return portStatus;   
+            return portStatusData;   
         }
     }
 }

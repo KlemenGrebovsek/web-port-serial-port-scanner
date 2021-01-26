@@ -7,6 +7,7 @@ using webport_comport_scanner.Model;
 using webport_comport_scanner.Option;
 using webport_comport_scanner.Printer;
 using webport_comport_scanner.Scanner;
+using webport_comport_scanner.Validator;
 
 namespace webport_comport_scanner.Command
 {
@@ -31,9 +32,10 @@ namespace webport_comport_scanner.Command
             
             var portScanner = new SerialPortScanner();
             var printer = new PortStatusPrinter(Console.Out);
-            
+
             try
             {
+                PortRangeValidator.Validate(pOptions.MinPort, pOptions.MaxPort);
                 var scanResult = await portScanner.ScanAsync(pOptions.MinPort, pOptions.MaxPort, cToken);
                 
                 if (pOptions.Status != PortStatus.Any)
