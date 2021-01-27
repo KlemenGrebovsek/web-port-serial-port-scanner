@@ -16,11 +16,11 @@ namespace webport_comport_scanner.Validator
             if (maxPort < minPort)
                 throw new InvalidPortRangeException("Max port value is less than min port value.");
             
-            if (minPort < 0)
-                throw new PortOutOfRangeException(nameof(minPort));
+            if (minPort < 0 || minPort > 65535)
+                throw new PortOutOfRangeException("Min port in out of range");
             
-            if (maxPort > 65535)
-                throw new PortOutOfRangeException(nameof(maxPort));
+            if (maxPort < 0 || maxPort > 65535)
+                throw new PortOutOfRangeException("Max port in out of range");
         }
     }
 }
