@@ -29,10 +29,10 @@ namespace webport_comport_scanner.Printer
         }
         
         /// <summary>
-        /// Prints a collection of port status in console as table. 
+        /// Prints collection of port statuses as a table.
         /// </summary>
-        /// <param name="portStatuses">A collection of type port status.</param>
-        /// <param name="cToken">A cancellation token</param>
+        /// <param name="portStatuses">A collection of port status.</param>
+        /// /// <param name="cToken">A cancellation token</param>
         public async Task PrintTableAsync(IEnumerable<IPrintablePortStatus> portStatuses, CancellationToken cToken)
         {
             if (!portStatuses.Any())
@@ -64,7 +64,7 @@ namespace webport_comport_scanner.Printer
         }
         
         /// <summary>
-        /// Fills string with empty chars to length.
+        /// Fills string with empty chars to length from left to right.
         /// </summary>
         /// <param name="value">Value to fill.</param>
         /// <param name="length">Expected string length.</param>

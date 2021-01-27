@@ -8,9 +8,9 @@ namespace webport_comport_scanner.Printer
     public interface IPortStatusPrinter
     {
         /// <summary>
-        /// Prints collection of ports statuses as a table.
+        /// Prints collection of port statuses as a table.
         /// </summary>
-        /// <param name="portStatuses">A collection of type IPrintablePortStatus.</param>
+        /// <param name="portStatuses">A collection of port status.</param>
         /// /// <param name="cToken">A cancellation token</param>
         Task PrintTableAsync(IEnumerable<IPrintablePortStatus> portStatuses, CancellationToken cToken);
     }

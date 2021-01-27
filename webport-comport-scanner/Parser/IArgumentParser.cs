@@ -6,7 +6,7 @@ namespace webport_comport_scanner.Parser
     public interface IArgumentParser
     {
         /// <summary>
-        /// Parses given arguments and starts executing command.
+        /// Parses arguments and starts executing command.
         /// </summary>
         /// <param name="args">Program arguments.</param>
         /// <returns>Collection of error messages if any.</returns>

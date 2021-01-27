@@ -14,13 +14,12 @@ namespace webport_comport_scanner.Scanner
     public class WebPortScanner : IPortScanner
     {
         /// <summary>
-        /// Scan for web ports and their status.
+        /// Scans for ports and their status.
         /// </summary>
-        /// <exception cref="Exception">If scan of ports can't be started or any other reason.</exception>
         /// <param name="minPort">Scan from this port (including).</param>
         /// <param name="maxPort">Scan to this port (including).</param>
         /// <param name="cToken">CancellationToken object.</param>
-        /// <returns>A collection of type web port statuses.</returns>
+        /// <returns>A collection of port status.</returns>
         public async Task<IEnumerable<IPrintablePortStatus>> ScanAsync(int minPort, int maxPort, CancellationToken cToken)
         {
             var iPHostEntry = Dns.GetHostEntry(Dns.GetHostName());
@@ -42,11 +41,11 @@ namespace webport_comport_scanner.Scanner
         }
 
         /// <summary>
-        /// Check status of specific port.
+        /// Scans status of web port.
         /// </summary>
         /// <param name="address">Host ip address.</param>
         /// <param name="port">Port number.</param>
-        /// <returns>Port status.</returns>
+        /// <returns>Web port status.</returns>
         private static IPrintablePortStatus GetPortStatus(IPAddress address, int port)
         {
             TcpListener tcpListener = null;

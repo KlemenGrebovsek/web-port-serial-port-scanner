@@ -10,7 +10,7 @@ using webport_comport_scanner.Validator;
 namespace webport_comport_scanner.Parser
 {
     /// <summary>
-    /// Web and serial port args parser.
+    /// Web and serial port argument parser.
     /// </summary>
     public class ArgumentParserWsp : IArgumentParser
     {
@@ -40,10 +40,10 @@ namespace webport_comport_scanner.Parser
         }
 
         /// <summary>
-        /// Parses given arguments and starts executing command.
+        /// Parses arguments and starts executing command.
         /// </summary>
         /// <param name="args">Program arguments.</param>
-        /// <returns>Collection of errors if any.</returns>
+        /// <returns>Collection of error messages if any.</returns>
         public async Task<IEnumerable<string>> ParseAsync(string[] args)
         {
             var parserResult = await _argParser.ParseAsync(args);

@@ -1,7 +1,7 @@
 namespace webport_comport_scanner.Option
 {
     /// <summary>
-    /// Contains command options.
+    /// Represents command options.
     /// </summary>
     public class CommandOptions
     {

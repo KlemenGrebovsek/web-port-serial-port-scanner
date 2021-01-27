@@ -14,13 +14,12 @@ namespace webport_comport_scanner.Scanner
     public class SerialPortScanner : IPortScanner
     {
         /// <summary>
-        /// Scans for serial ports and their status.
+        /// Scans for ports and their status.
         /// </summary>
-        /// <exception cref="Exception">If scan of ports can't be started or any other reason.</exception>
         /// <param name="minPort">Scan from this port (including).</param>
         /// <param name="maxPort">Scan to this port (including).</param>
         /// <param name="cToken">CancellationToken object.</param>
-        /// <returns>A collection of type serial port statuses.</returns>
+        /// <returns>A collection of port status.</returns>
         public async Task<IEnumerable<IPrintablePortStatus>> ScanAsync(int minPort, int maxPort, CancellationToken cToken)
         {
             var serialPorts = SerialPort.GetPortNames()
@@ -41,7 +40,7 @@ namespace webport_comport_scanner.Scanner
         }
 
         /// <summary>
-        /// Check status of serial ports.
+        /// Scans status of serial port.
         /// </summary>
         /// <returns>Serial port status.</returns>
         private static IPrintablePortStatus GetPortStatus(string portName)
