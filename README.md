@@ -1,15 +1,15 @@
 # web and serial port scanner
-Console program for scanning web port and serial port status.
+Program for scanning web port and serial port status.
 
 **Commands:**
 
 [webPort] 
 
-Description: Scans web ports and their status.
+Description: Scans for web ports and their status.
 
 [serialPort] 
 
-Description: Scans serial ports and their status.
+Description: Scans for serial ports and their status.
 
 [help] 
 
@@ -19,15 +19,15 @@ Description: Displays program options.
 
 [-f --from]  
 
-Description: Program scans ports that are equal or greater than this value (0 - 65535), default value is 0.
+Description: Program scans for ports that are equal or greater than this value (0 - 65535), default value is 0.
 
 [-t --to] 
 
-Description: Program scans ports that are equal or less than this value (0 - 65535), default value is 65535.
+Description: Program scans for ports that are equal or less than this value (0 - 65535), default value is 65535.
 
 [-s --status] 
 
-Description: Program searches for ports that have this status. (Any, Free, InUse, Unknown), default value is "Any";
+Description: Program filters ports by this status. (Any, Free, InUse, Unknown), default value is "Any";
 
 
 **Sample args**
