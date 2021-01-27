@@ -9,8 +9,8 @@ namespace webport_comport_scanner.Validator
         /// </summary>
         /// <exception cref="InvalidPortRangeException">If min and max port are logically wrong.</exception>
         /// <exception cref="PortOutOfRangeException">If min or max value is outside the port range. </exception>
-        /// <param name="minPort">Scan from this port (including).</param>
-        /// <param name="maxPort">Scan to this port (including).</param>
+        /// <param name="minPort">Min port value.</param>
+        /// <param name="maxPort">Max port value.</param>
         public static void Validate(int minPort, int maxPort)
         {
             if (maxPort < minPort)
