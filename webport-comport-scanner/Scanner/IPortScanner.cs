@@ -14,6 +14,6 @@ namespace webport_comport_scanner.Scanner
         /// <param name="maxPort">Scan to this port (including).</param>
         /// <param name="cToken">CancellationToken object.</param>
         /// <returns>A collection of port status.</returns>
-        Task<IEnumerable<IPrintablePortStatus>> ScanAsync(int minPort, int maxPort, CancellationToken cToken);
+        Task<IEnumerable<PortStatusData>> ScanAsync(int minPort, int maxPort, CancellationToken cToken);
     }
 }

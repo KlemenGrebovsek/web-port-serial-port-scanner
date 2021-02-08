@@ -40,10 +40,8 @@ namespace webport_comport_scanner.Command
 
                 if (pOptions.Status != PortStatus.Any)
                 {
-                    var stringStatus = pOptions.Status.ToString();
-                    
                     await printer.PrintTableAsync(scanResult
-                        .Where(x => x.GetStatusString() == stringStatus), cToken);
+                        .Where(x => x.PortStatus == pOptions.Status), cToken);
                 }
                 else
                 {
@@ -54,6 +52,7 @@ namespace webport_comport_scanner.Command
             catch (Exception e)
             {
                 Console.WriteLine($"Command 'webPort', ran into exception: {e.Message}");
+                throw;
             }
         }
     }

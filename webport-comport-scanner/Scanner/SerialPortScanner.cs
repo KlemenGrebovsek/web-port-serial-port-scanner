@@ -20,7 +20,7 @@ namespace webport_comport_scanner.Scanner
         /// <param name="maxPort">Scan to this port (including).</param>
         /// <param name="cToken">CancellationToken object.</param>
         /// <returns>A collection of port status.</returns>
-        public async Task<IEnumerable<IPrintablePortStatus>> ScanAsync(int minPort, int maxPort, CancellationToken cToken)
+        public async Task<IEnumerable<PortStatusData>> ScanAsync(int minPort, int maxPort, CancellationToken cToken)
         {
             var serialPorts = SerialPort.GetPortNames()
                 .Where(x => int.Parse(x.Substring(3)) >= minPort && int.Parse(x.Substring(3)) <= maxPort).ToList();
@@ -28,7 +28,7 @@ namespace webport_comport_scanner.Scanner
             if (serialPorts.Count < 1)
                 throw new Exception("No serial port found.");
             
-            var taskList = new List<Task<IPrintablePortStatus>>((maxPort - minPort) + 1);
+            var taskList = new List<Task<PortStatusData>>((maxPort - minPort) + 1);
 
             for (var i = minPort; i < maxPort + 1; i++)
             {
@@ -43,7 +43,7 @@ namespace webport_comport_scanner.Scanner
         /// Scans status of serial port.
         /// </summary>
         /// <returns>Serial port status.</returns>
-        private static IPrintablePortStatus GetPortStatus(string portName)
+        private static PortStatusData GetPortStatus(string portName)
         {
             PortStatusData serialPortStatus;
 
@@ -51,15 +51,15 @@ namespace webport_comport_scanner.Scanner
             {
                 using var serialPort  = new SerialPort(portName);
                 serialPort.Open();
-                serialPortStatus = new PortStatusData(portName, PortStatus.Free.ToString());
+                serialPortStatus = new PortStatusData(portName, PortStatus.Free);
             }
             catch (UnauthorizedAccessException)
             {
-                serialPortStatus = new PortStatusData(portName, PortStatus.InUse.ToString());
+                serialPortStatus = new PortStatusData(portName, PortStatus.InUse);
             }
             catch (Exception)
             {
-                serialPortStatus = new PortStatusData(portName, PortStatus.Unknown.ToString());
+                serialPortStatus = new PortStatusData(portName, PortStatus.Unknown);
             }
 
             return serialPortStatus;

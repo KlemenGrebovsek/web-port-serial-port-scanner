@@ -7,11 +7,13 @@
     {
         private readonly string _name;
         private readonly string _status;
+        public PortStatus PortStatus { get; }
 
-        public PortStatusData(string port, string status)
+        public PortStatusData(string port, PortStatus status)
         {
             _name = port;
-            _status = status;
+            _status = status.ToString();
+            PortStatus = status;
         }
         
         public string GetName()
