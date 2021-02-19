@@ -2,24 +2,29 @@ using System;
 using System.Linq;
 using Xunit;
 using System.Threading;
+using webport_comport_scanner.Models;
+using webport_comport_scanner.Scanners;
 
 namespace webport_comport_scanner.Test
 {
     public class SerialPortScannerTest
     {
-        /*
         [Fact]
         public void Test_MinPortLimit()
         {
             var spScanner = new SerialPortScanner();
             using var cancellationTokenSource = new CancellationTokenSource();
-            var cToken = cancellationTokenSource.Token; 
             
             try
             {
                 Assert.ThrowsAsync<ArgumentOutOfRangeException>( async () =>
                 {
-                    await spScanner.ScanAsync(-1, 3, cToken);
+                    var scanProperties = new ScanProperties()
+                    {
+                        MinPort = -1,
+                        MaxPort = 3
+                    };
+                    await spScanner.ScanAsync(scanProperties, cancellationTokenSource.Token);
                 });
             }
             catch (Exception e)
@@ -33,13 +38,17 @@ namespace webport_comport_scanner.Test
         {
             var spScanner = new SerialPortScanner();
             using var cancellationTokenSource = new CancellationTokenSource();
-            var cToken = cancellationTokenSource.Token; 
             
             try
             {
                 Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () =>
                 {
-                    await spScanner.ScanAsync(1, 65536, cToken);
+                    var scanProperties = new ScanProperties()
+                    {
+                        MinPort = 1,
+                        MaxPort = 65536
+                    };
+                    await spScanner.ScanAsync(scanProperties, cancellationTokenSource.Token);
                 });
             }
             catch (Exception e)
@@ -53,13 +62,17 @@ namespace webport_comport_scanner.Test
         {
             var spScanner = new SerialPortScanner();
             using var cancellationTokenSource = new CancellationTokenSource();
-            var cToken = cancellationTokenSource.Token; 
             
             try
             {
                 Assert.ThrowsAsync<ArgumentException>(async () =>
                 {
-                    await spScanner.ScanAsync(3, 1, cToken);
+                    var scanProperties = new ScanProperties()
+                    {
+                        MinPort = 3,
+                        MaxPort = 1
+                    };
+                    await spScanner.ScanAsync(scanProperties, cancellationTokenSource.Token);
                 });
             }
             catch (Exception e)
@@ -76,14 +89,19 @@ namespace webport_comport_scanner.Test
         {
             var spScanner = new SerialPortScanner();
             using var cancellationTokenSource = new CancellationTokenSource();
-            var cToken = cancellationTokenSource.Token;
-
+            
             var totalPorts = (maxPort - minPort) + 1;
             var actual = -1;
             
+            var scanProperties = new ScanProperties()
+            {
+                MinPort = minPort,
+                MaxPort = maxPort
+            };
+            
             try
             {
-                actual = spScanner.ScanAsync(minPort, maxPort, cToken).Result.Count();
+                actual = spScanner.ScanAsync(scanProperties, cancellationTokenSource.Token).Result.Count();
             }
             catch (Exception e)
             {
@@ -92,6 +110,5 @@ namespace webport_comport_scanner.Test
             
             Assert.Equal(totalPorts, actual);
         }
-        */
     }
 }
