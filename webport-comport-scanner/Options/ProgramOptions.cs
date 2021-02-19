@@ -1,7 +1,7 @@
 ﻿using MatthiWare.CommandLine.Core.Attributes;
-using webport_comport_scanner.Model;
+using webport_comport_scanner.Models;
 
-namespace webport_comport_scanner.Option
+namespace webport_comport_scanner.Options
 {
     /// <summary>
     /// Represents options for web and serial port arguments.

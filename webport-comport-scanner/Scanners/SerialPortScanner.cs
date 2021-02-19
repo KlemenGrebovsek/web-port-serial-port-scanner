@@ -1,12 +1,13 @@
 ﻿using System;
-using System.IO.Ports;
 using System.Collections.Generic;
+using System.IO.Ports;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using webport_comport_scanner.Model;
+using webport_comport_scanner.Exceptions;
+using webport_comport_scanner.Models;
 
-namespace webport_comport_scanner.Scanner
+namespace webport_comport_scanner.Scanners
 {
     /// <summary>
     /// Provides functionality of scanning serial ports.
@@ -16,27 +17,37 @@ namespace webport_comport_scanner.Scanner
         /// <summary>
         /// Scans for ports and their status.
         /// </summary>
-        /// <param name="minPort">Scan from this port (including).</param>
-        /// <param name="maxPort">Scan to this port (including).</param>
+        /// <param name="properties">Scan properties</param>
         /// <param name="cToken">CancellationToken object.</param>
         /// <returns>A collection of port status.</returns>
-        public async Task<IEnumerable<PortStatusData>> ScanAsync(int minPort, int maxPort, CancellationToken cToken)
+        public async Task<IEnumerable<PortStatusData>> ScanAsync(ScanProperties properties, CancellationToken cToken)
         {
-            var serialPorts = SerialPort.GetPortNames()
-                .Where(x => int.Parse(x.Substring(3)) >= minPort && int.Parse(x.Substring(3)) <= maxPort).ToList();
+            var serialPorts = GetPortNames(properties).ToList();
 
             if (serialPorts.Count < 1)
-                throw new Exception("No serial port found.");
+                throw new SerialPortNotFoundException();
             
-            var taskList = new List<Task<PortStatusData>>((maxPort - minPort) + 1);
+            var taskList = new List<Task<PortStatusData>>((properties.MaxPort - properties.MinPort) + 1);
 
-            for (var i = minPort; i < maxPort + 1; i++)
+            for (var i = properties.MinPort; i < properties.MaxPort + 1; i++)
             {
                 cToken.ThrowIfCancellationRequested();
                 taskList.Add(Task.FromResult(GetPortStatus(serialPorts[i])));
             }
 
             return await Task.Run(() => Task.WhenAll(taskList), cToken);
+        }
+
+        /// <summary>
+        /// Gets serial port names in range.
+        /// </summary>
+        /// <param name="properties">Scan properties</param>
+        /// <returns>Collection of port names in requested range.</returns>
+        private static IEnumerable<string> GetPortNames(ScanProperties properties)
+        {
+            return SerialPort.GetPortNames()
+                .Where(x => int.Parse(x.Substring(3)) >= properties.MinPort 
+                            && int.Parse(x.Substring(3)) <= properties.MaxPort);
         }
 
         /// <summary>

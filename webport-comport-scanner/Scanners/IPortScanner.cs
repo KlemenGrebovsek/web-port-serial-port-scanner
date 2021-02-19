@@ -1,19 +1,18 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using webport_comport_scanner.Model;
+using webport_comport_scanner.Models;
 
-namespace webport_comport_scanner.Scanner
+namespace webport_comport_scanner.Scanners
 {
     public interface IPortScanner
     {
         /// <summary>
         /// Scans for ports and their status.
         /// </summary>
-        /// <param name="minPort">Scan from this port (including).</param>
-        /// <param name="maxPort">Scan to this port (including).</param>
+        /// <param name="properties">Scan properties.</param>
         /// <param name="cToken">CancellationToken object.</param>
         /// <returns>A collection of port status.</returns>
-        Task<IEnumerable<PortStatusData>> ScanAsync(int minPort, int maxPort, CancellationToken cToken);
+        Task<IEnumerable<PortStatusData>> ScanAsync(ScanProperties properties, CancellationToken cToken);
     }
 }

@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
-using System.Threading.Tasks;
 using System.Threading;
-using webport_comport_scanner.Model;
+using System.Threading.Tasks;
+using webport_comport_scanner.Exceptions;
+using webport_comport_scanner.Models;
 
-namespace webport_comport_scanner.Scanner
+namespace webport_comport_scanner.Scanners
 {
     /// <summary>
     /// Provides functionality of scanning web ports.
@@ -16,28 +17,35 @@ namespace webport_comport_scanner.Scanner
         /// <summary>
         /// Scans for ports and their status.
         /// </summary>
-        /// <param name="minPort">Scan from this port (including).</param>
-        /// <param name="maxPort">Scan to this port (including).</param>
+        /// <param name="properties">Scan properties</param>
         /// <param name="cToken">CancellationToken object.</param>
         /// <returns>A collection of port status.</returns>
-        public async Task<IEnumerable<PortStatusData>> ScanAsync(int minPort, int maxPort, CancellationToken cToken)
+        public async Task<IEnumerable<PortStatusData>> ScanAsync(ScanProperties properties, CancellationToken cToken)
         {
-            var iPHostEntry = Dns.GetHostEntry(Dns.GetHostName());
+            var host = GetHost();
             
-            if (iPHostEntry.AddressList.Length < 1)
-                throw new Exception("Web port scan can't be started.");
-
-            var host = iPHostEntry.AddressList[0];
+            if (host == null)
+                throw new DefaultHostException();
             
-            var taskList = new List<Task<PortStatusData>>((maxPort - minPort) + 1);
+            var taskList = new List<Task<PortStatusData>>((properties.MaxPort - properties.MinPort) + 1);
 
-            for (var i = minPort; i < maxPort + 1; i++)
+            for (var i = properties.MinPort; i < properties.MaxPort + 1; i++)
             {
                 cToken.ThrowIfCancellationRequested();
                 taskList.Add(Task.FromResult(GetPortStatus(host, i)));
             }
             
             return await Task.Run(() => Task.WhenAll(taskList), cToken);
+        }
+
+        /// <summary>
+        /// Gets default host.
+        /// </summary>
+        /// <returns>Ip address of host.</returns>
+        private static IPAddress GetHost()
+        {
+            return Dns.GetHostEntry(Dns.GetHostName())
+                .AddressList[0];
         }
 
         /// <summary>

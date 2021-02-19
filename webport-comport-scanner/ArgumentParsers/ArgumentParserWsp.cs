@@ -1,13 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Threading.Tasks;
 using MatthiWare.CommandLine;
-using webport_comport_scanner.Option;
 using MatthiWare.CommandLine.Extensions.FluentValidations;
-using webport_comport_scanner.Validator;
+using webport_comport_scanner.Options;
+using webport_comport_scanner.Validators;
 
-namespace webport_comport_scanner.Parser
+namespace webport_comport_scanner.ArgumentParsers
 {
     /// <summary>
     /// Web and serial port argument parser.
@@ -43,15 +41,9 @@ namespace webport_comport_scanner.Parser
         /// Parses arguments and starts executing command.
         /// </summary>
         /// <param name="args">Program arguments.</param>
-        /// <returns>Collection of error messages if any.</returns>
-        public async Task<IEnumerable<string>> ParseAsync(string[] args)
+        public async Task ParseAsync(string[] args)
         {
-            var parserResult = await _argParser.ParseAsync(args);
-
-            if (!parserResult.HasErrors) 
-                return parserResult.Errors.Select(x => x.Message);
-
-            return Enumerable.Empty<string>();
+            await _argParser.ParseAsync(args);
         }
     }
 }

@@ -1,4 +1,4 @@
-namespace webport_comport_scanner.Option
+namespace webport_comport_scanner.Options
 {
     /// <summary>
     /// Represents command options.

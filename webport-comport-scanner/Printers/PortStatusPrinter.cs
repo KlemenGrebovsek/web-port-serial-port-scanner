@@ -3,9 +3,9 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using webport_comport_scanner.Model;
+using webport_comport_scanner.Models;
 
-namespace webport_comport_scanner.Printer
+namespace webport_comport_scanner.Printers
 {
     /// <summary>
     /// Provides functionality to print port scan result to console.
@@ -36,31 +36,30 @@ namespace webport_comport_scanner.Printer
         public async Task PrintTableAsync(IEnumerable<IPrintablePortStatus> portStatuses, CancellationToken cToken)
         {
             if (!portStatuses.Any())
-            {
-                await _writer.WriteAsync("No port to print.");
-                await _writer.FlushAsync();
                 return;
-            }
             
-            // Define table line which will be printed after each row.
-            var tableLine = $"\n+{new string('-', (ColWidth * 2) + 1 )}+";
-            
-            // Table header print
-            await _writer.WriteAsync($"\n {FillStringToLen(PortHeader, ColWidth)}"); 
-            await _writer.WriteAsync($" {FillStringToLen(StatusHeader, ColWidth)} ");
-            
-            // Generate rows of table
-            foreach (var result in portStatuses)
+            await using (_writer)
             {
-                cToken.ThrowIfCancellationRequested();
-                
-                await _writer.WriteAsync(tableLine);
-                await _writer.WriteAsync($"\n|{FillStringToLen(result.GetName(), ColWidth)}|");
-                await _writer.WriteAsync($"{FillStringToLen(result.GetStatusString(), ColWidth)}|");
-            }
+                // Define table line which will be printed after each row.
+                var tableLine = $"\n+{new string('-', (ColWidth * 2) + 1 )}+";
             
-            await _writer.WriteAsync(tableLine + "\n");
-            await _writer.FlushAsync();
+                // Table header print
+                await _writer.WriteAsync($"\n {FillStringToLen(PortHeader, ColWidth)}"); 
+                await _writer.WriteAsync($" {FillStringToLen(StatusHeader, ColWidth)} ");
+            
+                // Generate rows of table
+                foreach (var result in portStatuses)
+                {
+                    cToken.ThrowIfCancellationRequested();
+                
+                    await _writer.WriteAsync(tableLine);
+                    await _writer.WriteAsync($"\n|{FillStringToLen(result.GetName(), ColWidth)}|");
+                    await _writer.WriteAsync($"{FillStringToLen(result.GetStatusString(), ColWidth)}|");
+                }
+            
+                await _writer.WriteAsync(tableLine + "\n");
+                await _writer.FlushAsync();
+            }
         }
         
         /// <summary>

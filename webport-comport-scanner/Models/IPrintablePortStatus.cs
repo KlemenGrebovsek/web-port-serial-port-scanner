@@ -1,4 +1,4 @@
-﻿namespace webport_comport_scanner.Model
+﻿namespace webport_comport_scanner.Models
 {
     public interface IPrintablePortStatus
     {

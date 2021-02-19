@@ -1,7 +1,6 @@
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace webport_comport_scanner.Parser
+namespace webport_comport_scanner.ArgumentParsers
 {
     public interface IArgumentParser
     {
@@ -9,7 +8,6 @@ namespace webport_comport_scanner.Parser
         /// Parses arguments and starts executing command.
         /// </summary>
         /// <param name="args">Program arguments.</param>
-        /// <returns>Collection of error messages if any.</returns>
-        Task<IEnumerable<string>> ParseAsync (string[] args);
+        Task ParseAsync (string[] args);
     }
 }

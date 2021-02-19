@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using webport_comport_scanner.Model;
+using webport_comport_scanner.Models;
 
-namespace webport_comport_scanner.Printer
+namespace webport_comport_scanner.Printers
 {
     public interface IPortStatusPrinter
     {
