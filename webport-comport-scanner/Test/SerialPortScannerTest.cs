@@ -13,100 +13,75 @@ namespace webport_comport_scanner.Test
         public void Test_MinPortLimit()
         {
             var spScanner = new SerialPortScanner();
-            using var cancellationTokenSource = new CancellationTokenSource();
             
-            try
+            Assert.ThrowsAsync<ArgumentOutOfRangeException>( async () =>
             {
-                Assert.ThrowsAsync<ArgumentOutOfRangeException>( async () =>
+                var scanProperties = new ScanProperties
                 {
-                    var scanProperties = new ScanProperties()
-                    {
-                        MinPort = -1,
-                        MaxPort = 3
-                    };
-                    await spScanner.ScanAsync(scanProperties, cancellationTokenSource.Token);
-                });
-            }
-            catch (Exception e)
-            {
-                Assert.True(false, e.Message);
-            }
+                    MinPort = -1,
+                    MaxPort = 3
+                };
+                
+                await spScanner.ScanAsync(scanProperties, CancellationToken.None);
+            });
         }
 
         [Fact]
         public void Test_MaxPortLimit()
         {
             var spScanner = new SerialPortScanner();
-            using var cancellationTokenSource = new CancellationTokenSource();
             
-            try
+            Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () =>
             {
-                Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () =>
+                var scanProperties = new ScanProperties
                 {
-                    var scanProperties = new ScanProperties()
-                    {
-                        MinPort = 1,
-                        MaxPort = 65536
-                    };
-                    await spScanner.ScanAsync(scanProperties, cancellationTokenSource.Token);
-                });
-            }
-            catch (Exception e)
-            {
-                Assert.True(false, e.Message);
-            }
+                    MinPort = 1,
+                    MaxPort = 65536
+                };
+                
+                await spScanner.ScanAsync(scanProperties, CancellationToken.None);
+            });
         }
 
-        [Fact]
-        public void Test_InvalidPortScanRange()
+        [Theory]
+        [InlineData(3, 1)]
+        [InlineData(-3, 0)]
+        [InlineData(-5, -6)]
+        public void Test_InvalidPortScanRange(int minPort, int maxPort)
         {
             var spScanner = new SerialPortScanner();
-            using var cancellationTokenSource = new CancellationTokenSource();
             
-            try
+            Assert.ThrowsAsync<ArgumentException>(async () =>
             {
-                Assert.ThrowsAsync<ArgumentException>(async () =>
+                var scanProperties = new ScanProperties
                 {
-                    var scanProperties = new ScanProperties()
-                    {
-                        MinPort = 3,
-                        MaxPort = 1
-                    };
-                    await spScanner.ScanAsync(scanProperties, cancellationTokenSource.Token);
-                });
-            }
-            catch (Exception e)
-            {
-                Assert.True(false, e.Message);
-            }
+                    MinPort = minPort,
+                    MaxPort = maxPort
+                };
+                
+                await spScanner.ScanAsync(scanProperties, CancellationToken.None);
+            });
         }
 
         [Theory]
         [InlineData(15, 30)]
         [InlineData(40, 100)]
         [InlineData(10000, 10050)]
-        public void Test_PortScanRange(int minPort, int maxPort)
+        public void Test_ValidPortScanRange(int minPort, int maxPort)
         {
             var spScanner = new SerialPortScanner();
-            using var cancellationTokenSource = new CancellationTokenSource();
-            
             var totalPorts = (maxPort - minPort) + 1;
-            var actual = -1;
             
-            var scanProperties = new ScanProperties()
+            var scanProperties = new ScanProperties
             {
                 MinPort = minPort,
                 MaxPort = maxPort
             };
             
-            try
-            {
-                actual = spScanner.ScanAsync(scanProperties, cancellationTokenSource.Token).Result.Count();
-            }
-            catch (Exception e)
-            {
-                Assert.True(false, e.Message);
-            }
+            var actual = spScanner.ScanAsync(scanProperties, CancellationToken.None)
+                .GetAwaiter()
+                .GetResult()
+                .Count();
             
             Assert.Equal(totalPorts, actual);
         }

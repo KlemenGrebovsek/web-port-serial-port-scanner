@@ -3,9 +3,6 @@ using webport_comport_scanner.Options;
 
 namespace webport_comport_scanner.Validators
 {
-    /// <summary>
-    /// Provides validation for program options.
-    /// </summary>
     public class ProgramOptionsValidator: AbstractValidator<ProgramOptions>
     {
         public ProgramOptionsValidator()

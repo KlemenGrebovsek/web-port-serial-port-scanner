@@ -7,9 +7,6 @@ using webport_comport_scanner.Validators;
 
 namespace webport_comport_scanner.ArgumentParsers
 {
-    /// <summary>
-    /// Web and serial port argument parser.
-    /// </summary>
     public class ArgumentParserWsp : IArgumentParser
     {
         private readonly CommandLineParser<ProgramOptions> _argParser;
@@ -36,11 +33,7 @@ namespace webport_comport_scanner.ArgumentParsers
             
             _argParser.DiscoverCommands(Assembly.GetExecutingAssembly());
         }
-
-        /// <summary>
-        /// Parses arguments and starts executing command.
-        /// </summary>
-        /// <param name="args">Program arguments.</param>
+        
         public async Task ParseAsync(string[] args)
         {
             await _argParser.ParseAsync(args);

@@ -11,9 +11,6 @@ using webport_comport_scanner.Scanners;
 
 namespace webport_comport_scanner.Commands
 {
-    /// <summary>
-    /// Scans for web ports and their status.
-    /// </summary>
     public class ScanWebPortCommand : Command<ProgramOptions, CommandOptions>
     {
         private readonly IPortStatusPrinter _printer;
@@ -42,7 +39,7 @@ namespace webport_comport_scanner.Commands
             if (pOptions.Status != PortStatus.Any)
             {
                 await _printer.PrintTableAsync(scanResult
-                    .Where(x => x.PortStatus == pOptions.Status), cToken);
+                    .Where(x => x.GetPortStatus() == pOptions.Status), cToken);
                     
                 return;
             }

@@ -3,9 +3,6 @@ using webport_comport_scanner.Models;
 
 namespace webport_comport_scanner.Options
 {
-    /// <summary>
-    /// Represents options for web and serial port arguments.
-    /// </summary>
     public class ProgramOptions
     {
         [Name("f", "from")]

@@ -7,9 +7,6 @@ using webport_comport_scanner.Models;
 
 namespace webport_comport_scanner.Printers
 {
-    /// <summary>
-    /// Provides functionality to print port scan result to console.
-    /// </summary>
     public class PortStatusPrinter : IPortStatusPrinter
     {
         // Represents first column header text.
@@ -28,11 +25,6 @@ namespace webport_comport_scanner.Printers
             _writer = textWriter;
         }
         
-        /// <summary>
-        /// Prints collection of port statuses as a table.
-        /// </summary>
-        /// <param name="portStatuses">A collection of port status.</param>
-        /// /// <param name="cToken">A cancellation token</param>
         public async Task PrintTableAsync(IEnumerable<IPrintablePortStatus> portStatuses, CancellationToken cToken)
         {
             if (!portStatuses.Any())
@@ -40,7 +32,7 @@ namespace webport_comport_scanner.Printers
             
             await using (_writer)
             {
-                // Define table line which will be printed after each row.
+                // Define table line.
                 var tableLine = $"\n+{new string('-', (ColWidth * 2) + 1 )}+";
             
                 // Table header print
@@ -62,12 +54,6 @@ namespace webport_comport_scanner.Printers
             }
         }
         
-        /// <summary>
-        /// Fills string with empty chars to length from left to right.
-        /// </summary>
-        /// <param name="value">Value to fill.</param>
-        /// <param name="length">Expected string length.</param>
-        /// <returns>A string of length of column filled with empty sequence.</returns>
         private static string FillStringToLen(string value, int length)
         {
             return string.Format($"{{0,{length * -1}}}", string.Format($"{{0,{(length + value.Length) / 2}}}", value));
