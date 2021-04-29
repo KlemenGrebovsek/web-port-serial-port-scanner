@@ -19,8 +19,6 @@ namespace webport_comport_scanner.Scanners
 
             for (var i = properties.MinPort; i < properties.MaxPort + 1; i++)
             {
-                cToken.ThrowIfCancellationRequested();
-                
                 var portNumber = i;
                 var t = new Task<PortStatusData>(() => GetPortStatus(host, portNumber), cToken);
                 t.Start();
